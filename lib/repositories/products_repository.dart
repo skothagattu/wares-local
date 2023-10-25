@@ -6,7 +6,7 @@ import 'package:http/http.dart' as http;
 
 abstract class IProductRepository {
   Future<ProductListResponse> fetchProductList();
-
+  Future<bool> updateProduct(Product product);
 }
 
 class ProductRepository implements IProductRepository{
@@ -27,5 +27,16 @@ class ProductRepository implements IProductRepository{
     var response = ProductListResponse.fromJson(jsonObject);
 
     return response;
+  }
+
+  @override
+  Future<bool> updateProduct(Product product) async {
+    final url = Uri.parse('$_host/updateProduct'); // Adjust the URL as needed
+    final response = await http.post(
+      url,
+      headers: _headers,
+      body: json.encode(product.toJson()), // Ensure your Product model has a toJson method
+    );
+    return response.statusCode == 200; // Adjust as needed based on your API's response
   }
 }

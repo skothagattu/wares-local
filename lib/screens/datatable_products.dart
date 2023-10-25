@@ -105,47 +105,54 @@ class _ProductTableState extends State<ProductTable> {
                   ],
                   rows: displayedProducts
                       .map(
-                        (product) => DataRow(cells: [
-                      DataCell(Text(product.id.toString())),
-                      DataCell(Text(product.productno)),
-                      DataCell(Text(product.rev ?? 'N/A')),
-                      DataCell(Text(product.description ?? 'N/A')),
-                      DataCell(Text(product.configuration ?? 'N/A')),
-                      DataCell(Text(product.llc?.toString() ?? 'N/A')),
-                      DataCell(Text(product.level1 ?? 'N/A')),
-                      DataCell(Text(product.type ?? 'N/A')),
-                      DataCell(Text(product.ecr ?? 'N/A')),
-                      DataCell(Text(product.listprice?.toString() ?? 'N/A')),
-                      DataCell(Text(product.comments ?? 'N/A')),
-                      DataCell(Text(product.active ?? 'N/A')),
-                      DataCell(Text(product.labelDesc ?? 'N/A')),
-                      DataCell(Text(product.productSpec ?? 'N/A')),
-                      DataCell(Text(product.labelConfig ?? 'N/A')),
-                      DataCell(Text(product.dateReq ?? 'N/A')),
-                      DataCell(Text(product.dateDue ?? 'N/A')),
-                      DataCell(Text(product.level2 ?? 'N/A')),
-                      DataCell(Text(product.level3 ?? 'N/A')),
-                      DataCell(Text(product.level4 ?? 'N/A')),
-                      DataCell(Text(product.level5 ?? 'N/A')),
-                      DataCell(Text(product.sequenceNum?.toString() ?? 'N/A')),
-                      DataCell(Text(product.locationWares ?? 'N/A')),
-                      DataCell(Text(product.locationAccpac ?? 'N/A')),
-                      DataCell(Text(product.locationMisys ?? 'N/A')),
-                      DataCell(Text(product.level6 ?? 'N/A')),
-                      DataCell(Text(product.level7 ?? 'N/A')),
-                      DataCell(Text(product.instGuide ?? 'N/A')),
-                    ],
-                      onSelectChanged: (isSelected) {
-                          if (isSelected != null && isSelected) {
-                                    showDialog(
+                        (product) {
+                        print("Debug Product: $product");
+                        return DataRow(cells: [
+                          DataCell(Text(product.id.toString())),
+                          DataCell(Text(product.productno)),
+                          DataCell(Text(product.rev ?? 'N/A')),
+                          DataCell(Text(product.description ?? 'N/A')),
+                          DataCell(Text(product.configuration ?? 'N/A')),
+                          DataCell(Text(product.llc?.toString() ?? 'N/A')),
+                          DataCell(Text(product.leveL1 ?? 'N/A')),
+                          DataCell(Text(product.type ?? 'N/A')),
+                          DataCell(Text(product.ecr ?? 'N/A')),
+                          DataCell(
+                              Text(product.listprice?.toString() ?? 'N/A')),
+                          DataCell(Text(product.comments ?? 'N/A')),
+                          DataCell(Text(product.active ?? 'N/A')),
+                          DataCell(Text(product.labeL_DESC ?? 'N/A')),
+                          DataCell(Text(product.producT_SPEC ?? 'N/A')),
+                          DataCell(Text(product.labeL_CONFIG ?? 'N/A')),
+                          DataCell(Text(product.datE_REQ ?? 'N/A')),
+                          DataCell(Text(product.datE_DUE ?? 'N/A')),
+                          DataCell(Text(product.level2 ?? 'N/A')),
+                          DataCell(Text(product.level3 ?? 'N/A')),
+                          DataCell(Text(product.level4 ?? 'N/A')),
+                          DataCell(Text(product.level5 ?? 'N/A')),
+                          DataCell(
+                              Text(product.sequenceNum?.toString() ?? 'N/A')),
+                          DataCell(Text(product.locationWares ?? 'N/A')),
+                          DataCell(Text(product.locationAccpac ?? 'N/A')),
+                          DataCell(Text(product.locationMisys ?? 'N/A')),
+                          DataCell(Text(product.level6 ?? 'N/A')),
+                          DataCell(Text(product.level7 ?? 'N/A')),
+                          DataCell(Text(product.instGuide ?? 'N/A')),
+                        ],
+                          onSelectChanged: (isSelected) {
+                            if (isSelected != null && isSelected) {
+                              showDialog(
                                 context: context,
-                          builder: (context) => EditProductForm(product: product),
-                                   );
-                         }
-                                 },
+                                builder: (context) =>
+                                    EditProductForm(product: product),
+                              );
+                            }
+                          },
 
 
-                        ),
+                        );
+
+                      }
                   )
                       .toList(),
                 ),

@@ -1,7 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:wares/providers/provider.dart';
-
 import '../providers/provider_products.dart';
 import 'datatable_products.dart';
 
