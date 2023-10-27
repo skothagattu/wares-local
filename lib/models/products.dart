@@ -22,6 +22,10 @@ class ProductListResponse {
     _data['data'] = data.toJson();
     return _data;
   }
+  @override
+  String toString() {
+    return 'ProductListResponse{status: $status, message: $message, data: $data}';
+  }
 }
 
 class ProductData {
@@ -56,6 +60,10 @@ class ProductData {
     _data['totalItems'] = totalItems;
     return _data;
   }
+  @override
+  String toString() {
+    return 'ProductData{items: $items, totalCount: $totalCount, currentPage: $currentPage, pageSize: $pageSize, totalItems: $totalItems}';
+  }
 }
 
 class Product {
@@ -78,17 +86,17 @@ class Product {
     this.labeL_CONFIG,
     this.datE_REQ,
     this.datE_DUE,
-    this.level2,
-    this.level3,
-    this.level4,
-    this.level5,
-    this.sequenceNum,
-    this.locationWares,
-    this.locationAccpac,
-    this.locationMisys,
-    this.level6,
-    this.level7,
-    this.instGuide,
+    this.leveL2,
+    this.leveL3,
+    this.leveL4,
+    this.leveL5,
+    this.sequencE_NUM,
+    this.locatioN_WARES,
+    this.locatioN_ACCPAC,
+    this.locatioN_MISYS,
+    this.leveL6,
+    this.leveL7,
+    this.insT_GUIDE,
   });
 
   late final int id;
@@ -109,17 +117,17 @@ class Product {
   late final String? labeL_CONFIG;
   late final String? datE_REQ;
   late final String? datE_DUE;
-  late final String? level2;
-  late final String? level3;
-  late final String? level4;
-  late final String? level5;
-  late final int? sequenceNum;
-  late final String? locationWares;
-  late final String? locationAccpac;
-  late final String? locationMisys;
-  late final String? level6;
-  late final String? level7;
-  late final String? instGuide;
+  late final String? leveL2;
+  late final String? leveL3;
+  late final String? leveL4;
+  late final String? leveL5;
+  late final int? sequencE_NUM;
+  late final String? locatioN_WARES;
+  late final String? locatioN_ACCPAC;
+  late final String? locatioN_MISYS;
+  late final String? leveL6;
+  late final String? leveL7;
+  late final String? insT_GUIDE;
 
   Product.fromJson(Map<String, dynamic> json) {
     id = json['id'];
@@ -135,22 +143,22 @@ class Product {
     listprice = json['listprice'];
     comments = json['comments'];
     active = json['active'];
-    labeL_DESC = json['labelDesc'];
-    producT_SPEC = json['productSpec'];
-    labeL_CONFIG = json['labelConfig'];
-    datE_REQ = json['dateReq'];
-    datE_DUE = json['dateDue'];
-    level2 = json['level2'];
-    level3 = json['level3'];
-    level4 = json['level4'];
-    level5 = json['level5'];
-    sequenceNum = json['sequenceNum'];
-    locationWares = json['locationWares'];
-    locationAccpac = json['locationAccpac'];
-    locationMisys = json['locationMisys'];
-    level6 = json['level6'];
-    level7 = json['level7'];
-    instGuide = json['instGuide'];
+    labeL_DESC = json['labeL_DESC'];
+    producT_SPEC = json['producT_SPEC'];
+    labeL_CONFIG = json['labeL_CONFIG'];
+    datE_REQ = json['datE_REQ'];
+    datE_DUE = json['datE_DUE'];
+    leveL2 = json['leveL2'];
+    leveL3 = json['leveL3'];
+    leveL4 = json['leveL4'];
+    leveL5 = json['leveL5'];
+    sequencE_NUM = json['sequencE_NUM'];
+    locatioN_WARES = json['locatioN_WARES'];
+    locatioN_ACCPAC = json['locatioN_ACCPAC'];
+    locatioN_MISYS = json['locatioN_MISYS'];
+    leveL6 = json['leveL6'];
+    leveL7 = json['leveL7'];
+    insT_GUIDE = json['insT_GUIDE'];
   }
 
   Map<String, dynamic> toJson() {
@@ -162,34 +170,34 @@ class Product {
     _data['description'] = description;
     _data['configuration'] = configuration;
     _data['llc'] = llc;
-    _data['level1'] = leveL1;
+    _data['leveL1'] = leveL1;
     _data['type'] = type;
     _data['ecr'] = ecr;
     _data['listprice'] = listprice;
     _data['comments'] = comments;
     _data['active'] = active;
-    _data['labelDesc'] = labeL_DESC;
-    _data['productSpec'] = producT_SPEC;
-    _data['labelConfig'] = labeL_CONFIG;
-    _data['dateReq'] = datE_REQ;
-    _data['dateDue'] = datE_DUE;
-    _data['level2'] = level2;
-    _data['level3'] = level3;
-    _data['level4'] = level4;
-    _data['level5'] = level5;
-    _data['sequenceNum'] = sequenceNum;
-    _data['locationWares'] = locationWares;
-    _data['locationAccpac'] = locationAccpac;
-    _data['locationMisys'] = locationMisys;
-    _data['level6'] = level6;
-    _data['level7'] = level7;
-    _data['instGuide'] = instGuide;
+    _data['labeL_DESC'] = labeL_DESC;
+    _data['producT_SPEC'] = producT_SPEC;
+    _data['labeL_CONFIG'] = labeL_CONFIG;
+    _data['datE_Req'] = datE_REQ;
+    _data['datE_Due'] = datE_DUE;
+    _data['leveL2'] = leveL2;
+    _data['leveL3'] = leveL3;
+    _data['leveL4'] = leveL4;
+    _data['leveL5'] = leveL5;
+    _data['sequencE_NUM'] = sequencE_NUM;
+    _data['locatioN_WARES'] = locatioN_WARES;
+    _data['locatioN_ACCPAC'] = locatioN_ACCPAC;
+    _data['locatioN_MISYS'] = locatioN_MISYS;
+    _data['leveL6'] = leveL6;
+    _data['leveL7'] = leveL7;
+    _data['insT_GUIDE'] = insT_GUIDE;
     return _data;
 
 
   }
   @override
   String toString() {
-    return 'Product{id: $id, productno: $productno, rev: $rev, description: $description, configuration: $configuration, llc: $llc, level1: $leveL1, type: $type, ecr: $ecr, listprice: $listprice, comments: $comments, active: $active, labelDesc: $labeL_DESC, productSpec: $producT_SPEC, labelConfig: $labeL_CONFIG, dateReq: $datE_REQ, dateDue: $datE_DUE, level2: $level2, level3: $level3, level4: $level4, level5: $level5, sequenceNum: $sequenceNum, locationWares: $locationWares, locationAccpac: $locationAccpac, locationMisys: $locationMisys, level6: $level6, level7: $level7, instGuide: $instGuide}';
+    return 'Product{id: $id, productno: $productno, rev: $rev, description: $description, configuration: $configuration, llc: $llc, level1: $leveL1, type: $type, ecr: $ecr, listprice: $listprice, comments: $comments, active: $active, labelDesc: $labeL_DESC, productSpec: $producT_SPEC, labelConfig: $labeL_CONFIG, dateReq: $datE_REQ, dateDue: $datE_DUE, level2: $leveL2, level3: $leveL3, level4: $leveL4, level5: $leveL5, sequenceNum: $sequencE_NUM, locationWares: $locatioN_WARES, locationAccpac: $locatioN_ACCPAC, locationMisys: $locatioN_MISYS, level6: $leveL6, level7: $leveL7, instGuide: $insT_GUIDE}';
   }
 }

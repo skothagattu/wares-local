@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:resize/resize.dart';
+import 'package:wares/models/products_submission.dart';
 
 import '../models/products.dart';
 import '../repositories/products_repository.dart';
@@ -7,8 +8,9 @@ import 'edit_products_form.dart';
 
 class ProductTable extends StatefulWidget {
   final List<Product> products;
+  final List<ProductSubmission> productSubmission;
 
-  ProductTable({required this.products});
+  ProductTable({required this.products, required this.productSubmission});
 
   @override
   _ProductTableState createState() => _ProductTableState();
@@ -106,7 +108,7 @@ class _ProductTableState extends State<ProductTable> {
                   rows: displayedProducts
                       .map(
                         (product) {
-                        print("Debug Product: $product");
+                       /* print("Debug Product: $product");*/
                         return DataRow(cells: [
                           DataCell(Text(product.id.toString())),
                           DataCell(Text(product.productno)),
@@ -126,25 +128,26 @@ class _ProductTableState extends State<ProductTable> {
                           DataCell(Text(product.labeL_CONFIG ?? 'N/A')),
                           DataCell(Text(product.datE_REQ ?? 'N/A')),
                           DataCell(Text(product.datE_DUE ?? 'N/A')),
-                          DataCell(Text(product.level2 ?? 'N/A')),
-                          DataCell(Text(product.level3 ?? 'N/A')),
-                          DataCell(Text(product.level4 ?? 'N/A')),
-                          DataCell(Text(product.level5 ?? 'N/A')),
+                          DataCell(Text(product.leveL2 ?? 'N/A')),
+                          DataCell(Text(product.leveL3 ?? 'N/A')),
+                          DataCell(Text(product.leveL4 ?? 'N/A')),
+                          DataCell(Text(product.leveL5 ?? 'N/A')),
                           DataCell(
-                              Text(product.sequenceNum?.toString() ?? 'N/A')),
-                          DataCell(Text(product.locationWares ?? 'N/A')),
-                          DataCell(Text(product.locationAccpac ?? 'N/A')),
-                          DataCell(Text(product.locationMisys ?? 'N/A')),
-                          DataCell(Text(product.level6 ?? 'N/A')),
-                          DataCell(Text(product.level7 ?? 'N/A')),
-                          DataCell(Text(product.instGuide ?? 'N/A')),
+                              Text(product.sequencE_NUM?.toString() ?? 'N/A')),
+                          DataCell(Text(product.locatioN_WARES ?? 'N/A')),
+                          DataCell(Text(product.locatioN_ACCPAC ?? 'N/A')),
+                          DataCell(Text(product.locatioN_MISYS ?? 'N/A')),
+                          DataCell(Text(product.leveL6 ?? 'N/A')),
+                          DataCell(Text(product.leveL7 ?? 'N/A')),
+                          DataCell(Text(product.insT_GUIDE ?? 'N/A')),
                         ],
                           onSelectChanged: (isSelected) {
                             if (isSelected != null && isSelected) {
+                              ProductSubmission productSubmission = ProductSubmission.fromProduct(product);
                               showDialog(
                                 context: context,
                                 builder: (context) =>
-                                    EditProductForm(product: product),
+                                    EditProductForm(productSubmission: productSubmission),
                               );
                             }
                           },

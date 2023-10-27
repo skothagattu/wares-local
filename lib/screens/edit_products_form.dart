@@ -1,22 +1,22 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:tuple/tuple.dart';
+import 'package:wares/models/products_submission.dart';
 import '../models/products.dart';
 import '../providers/provider_products.dart';
 
 class EditProductForm extends StatefulWidget {
-  final Product product;
+  final ProductSubmission productSubmission;
 
-  EditProductForm({required this.product});
+  EditProductForm({required this.productSubmission});
+
 
   @override
   _EditProductFormState createState() => _EditProductFormState();
 }
 
 class _EditProductFormState extends State<EditProductForm> {
-  late TextEditingController _idController;
-  late TextEditingController _productNoController;
   late TextEditingController _revController;
-  late TextEditingController _alphaController;
   late TextEditingController _descriptionController;
   late TextEditingController _configurationController;
   late TextEditingController _llcController;
@@ -50,35 +50,32 @@ class _EditProductFormState extends State<EditProductForm> {
   @override
   void initState() {
     super.initState();
-    _idController = TextEditingController(text: widget.product.id?.toString());
-    _productNoController = TextEditingController(text: widget.product.productno);
-    _revController = TextEditingController(text: widget.product.rev);
-    _alphaController = TextEditingController(text: widget.product.alpha);
-    _descriptionController = TextEditingController(text: widget.product.description);
-    _configurationController = TextEditingController(text: widget.product.configuration);
-    _llcController = TextEditingController(text: widget.product.llc?.toString() ?? '');
-    _level1Controller = TextEditingController(text: widget.product.leveL1);
-    _typeController = TextEditingController(text: widget.product.type);
-    _ecrController = TextEditingController(text: widget.product.ecr);
-    _listpriceController =TextEditingController(text: widget.product.listprice?.toString() ?? '');
-    _commentsController = TextEditingController(text: widget.product.comments);
-    _activeController = TextEditingController(text: widget.product.active);
-    _labelDescController = TextEditingController(text: widget.product.labeL_DESC);
-    _productSpecController = TextEditingController(text: widget.product.producT_SPEC);
-    _labelConfigController = TextEditingController(text: widget.product.labeL_CONFIG);
-    _dateReqController = TextEditingController(text: widget.product.datE_REQ);
-    _dateDueController = TextEditingController(text: widget.product.datE_DUE);
-    _level2Controller = TextEditingController(text: widget.product.level2);
-    _level3Controller = TextEditingController(text: widget.product.level3);
-    _level4Controller = TextEditingController(text: widget.product.level4);
-    _level5Controller = TextEditingController(text: widget.product.level5);
-    _sequenceNumController = TextEditingController(text: widget.product.sequenceNum?.toString() ?? '');
-    _locationWaresController = TextEditingController(text: widget.product.locationWares);
-    _locationAccpacController = TextEditingController(text: widget.product.locationAccpac);
-    _locationMisysController = TextEditingController(text: widget.product.locationMisys);
-    _level6Controller = TextEditingController(text: widget.product.level6);
-    _level7Controller = TextEditingController(text: widget.product.level7);
-    _instGuideController = TextEditingController(text: widget.product.instGuide);
+    _revController = TextEditingController(text: widget.productSubmission.rev);
+    _descriptionController = TextEditingController(text: widget.productSubmission.description);
+    _configurationController = TextEditingController(text: widget.productSubmission.configuration);
+    _llcController = TextEditingController(text: widget.productSubmission.llc?.toString() ?? '');
+    _level1Controller = TextEditingController(text: widget.productSubmission.level1);
+    _typeController = TextEditingController(text: widget.productSubmission.type);
+    _ecrController = TextEditingController(text: widget.productSubmission.ecr);
+    _listpriceController =TextEditingController(text: widget.productSubmission.listprice?.toString() ?? '');
+    _commentsController = TextEditingController(text: widget.productSubmission.comments);
+    _activeController = TextEditingController(text: widget.productSubmission.active);
+    _labelDescController = TextEditingController(text: widget.productSubmission.labelDesc);
+    _productSpecController = TextEditingController(text: widget.productSubmission.productSpec);
+    _labelConfigController = TextEditingController(text: widget.productSubmission.labelConfig);
+    _dateReqController = TextEditingController(text: widget.productSubmission.dateReq);
+    _dateDueController = TextEditingController(text: widget.productSubmission.dateDue);
+    _level2Controller = TextEditingController(text: widget.productSubmission.level2);
+    _level3Controller = TextEditingController(text: widget.productSubmission.level3);
+    _level4Controller = TextEditingController(text: widget.productSubmission.level4);
+    _level5Controller = TextEditingController(text: widget.productSubmission.level5);
+    _sequenceNumController = TextEditingController(text: widget.productSubmission.sequenceNum?.toString() ?? '');
+    _locationWaresController = TextEditingController(text: widget.productSubmission.locationWares);
+    _locationAccpacController = TextEditingController(text: widget.productSubmission.locationAccpac);
+    _locationMisysController = TextEditingController(text: widget.productSubmission.locationMisys);
+    _level6Controller = TextEditingController(text: widget.productSubmission.level6);
+    _level7Controller = TextEditingController(text: widget.productSubmission.level7);
+    _instGuideController = TextEditingController(text: widget.productSubmission.instGuide);
 
     // ... Initialize other controllers as needed
   }
@@ -93,21 +90,21 @@ class _EditProductFormState extends State<EditProductForm> {
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
-                TextField(
-                  controller: _idController,
-                  decoration: InputDecoration(labelText: 'ID'),
+                Row(
+                  children: [
+                    Text('ID: '),
+                    Text(widget.productSubmission.id?.toString() ?? 'N/A'),
+                  ],
                 ),
-                TextField(
-                  controller: _productNoController,
-                  decoration: InputDecoration(labelText: 'Product No'),
+                Row(
+                  children: [
+                    Text('Product No: '),
+                    Text(widget.productSubmission.productno ?? 'N/A'),
+                  ],
                 ),
                 TextField(
                   controller: _revController,
                   decoration: InputDecoration(labelText: 'Rev'),
-                ),
-                TextField(
-                  controller: _alphaController,
-                  decoration: InputDecoration(labelText: 'Alpha'),
                 ),
                 TextField(
                   controller: _descriptionController,
@@ -167,7 +164,7 @@ class _EditProductFormState extends State<EditProductForm> {
                 ),
                 TextField(
                   controller: _level2Controller,
-                  decoration: InputDecoration(labelText: 'level2'),
+                  decoration: InputDecoration(labelText: 'leve2'),
                 ),
                 TextField(
                   controller: _level3Controller,
@@ -224,37 +221,40 @@ class _EditProductFormState extends State<EditProductForm> {
               onPressed: () {
                 // Update the product details here
                 // For example, send a PUT request to your API
-                final product = Product(
-                  id: widget.product.id ?? (throw 'Product ID is null'),
-                  productno: _productNoController.text,
-                  rev: _revController.text,
-                  alpha: _alphaController.text,
-                  description: _descriptionController.text,
-                    configuration: _configurationController.text,
-                  llc: int.tryParse(_llcController.text),
-                  leveL1: _level1Controller.text,
-                  type: _typeController.text,
-                  ecr: _ecrController.text,
-                  listprice: int.tryParse(_listpriceController.text),
-                  comments: _commentsController.text,
-                  active: _activeController.text,
-                  labeL_DESC: _labelDescController.text,
-                  producT_SPEC: _productSpecController.text,
-                  labeL_CONFIG: _labelConfigController.text,
-                  datE_REQ: _dateReqController.text,
-                  datE_DUE: _dateDueController.text,
-                  level2: _level2Controller.text,
-                  level3: _level3Controller.text,
-                  level4: _level4Controller.text,
-                  level5: _level5Controller.text,
-                  sequenceNum: int.tryParse(_sequenceNumController.text),
-                  locationWares: _locationWaresController.text,
-                  locationAccpac: _locationAccpacController.text,
-                  locationMisys: _locationMisysController.text,
-                  instGuide: _instGuideController.text,
+                final productNo = widget.productSubmission.productno ?? (throw 'Product No is null');
+                final UpdateProductSubmission = ProductSubmission(
+                  rev: _emptyToNull(_revController.text),
+                  description: _emptyToNull(_descriptionController.text),
+                  configuration: _emptyToNull(_configurationController.text),
+                  llc: _emptyToNull(_llcController.text),
+                  level1: _emptyToNull(_level1Controller.text),
+                  type: _emptyToNull(_typeController.text),
+                  ecr: _emptyToNull(_ecrController.text),
+                  listprice: _emptyToNull(_listpriceController.text),
+                  comments: _emptyToNull(_commentsController.text),
+                  active: _emptyToNull(_activeController.text),
+                  labelDesc: _emptyToNull(_labelDescController.text),
+                  productSpec: _emptyToNull(_productSpecController.text),
+                  labelConfig: _emptyToNull(_labelConfigController.text),
+                  dateReq: _emptyToNull(_dateReqController.text),
+                  dateDue: _emptyToNull(_dateDueController.text),
+                  level2: _emptyToNull(_level2Controller.text),
+                  level3: _emptyToNull(_level3Controller.text),
+                  level4: _emptyToNull(_level4Controller.text),
+                  level5: _emptyToNull(_level5Controller.text),
+                  sequenceNum: _emptyToNull(_sequenceNumController.text),
+                  locationWares: _emptyToNull(_locationWaresController.text),
+                  locationAccpac: _emptyToNull(_locationAccpacController.text),
+                  locationMisys: _emptyToNull(_locationMisysController.text),
+                  level6: _emptyToNull(_level6Controller.text),
+                  level7: _emptyToNull(_level7Controller.text),
+                  instGuide: _emptyToNull(_instGuideController.text),
                   // ... Set other fields as needed
                 );
-                ref.read(updateProductProvider(product).future).then((success) {
+          /*      print('Updated Product: $UpdateProductSubmission');*/
+
+
+                ref.read(updateProductProvider(Tuple2(productNo, UpdateProductSubmission)).future).then((success) {
                   if (success) {
                     Navigator.of(context).pop();
                     ScaffoldMessenger.of(context).showSnackBar(
@@ -265,6 +265,11 @@ class _EditProductFormState extends State<EditProductForm> {
                       SnackBar(content: Text('Failed to update product')),
                     );
                   }
+                }).catchError((error) {
+                  print('An error occurred: $error');
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(content: Text('An error occurred while updating the product')),
+                  );
                 });
               },
               child: Text('Save'),
@@ -274,4 +279,11 @@ class _EditProductFormState extends State<EditProductForm> {
       },
     );
   }
+  String? _emptyToNull(String? input) {
+    if (input == null || input.trim().isEmpty) {
+      return null;
+    }
+    return input;
+  }
+
 }

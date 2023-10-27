@@ -34,7 +34,7 @@ class ProductDataTable extends ConsumerWidget {
     final listProducts = ref.watch(productList); // Make sure you have a productListProvider
     return listProducts.when(
       data: (products) {
-        return ProductTable(products: products.data.items); // Use the ProductTable widget here
+        return ProductTable(products: products.data.items, productSubmission: [],); // Use the ProductTable widget here
       },
       loading: () => const Center(
         child: CircularProgressIndicator(),
