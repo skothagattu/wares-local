@@ -37,13 +37,15 @@ class ProductRepository implements IProductRepository{
     final url = Uri.parse('$_host/updateProduct/$productNo'); // Adjust the URL as needed
     final productMap = productSubmission.toJson();
 print(url);
-    final response = await http.post(
+    final response = await http.put(
       url,
       headers: _headers,
       body: json.encode(productMap),
      // Ensure your Product model has a toJson method
     );
-    print(json.encode(productMap));
-    return response.statusCode == 200; // Adjust as needed based on your API's response
+
+    print('Status Code: ${response.statusCode}');
+    print('Response Body: ${response.body}');
+    return response.statusCode == 200|| response.statusCode == 204;  // Adjust as needed based on your API's response
   }
 }

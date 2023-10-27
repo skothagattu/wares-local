@@ -80,6 +80,7 @@ class _EditProductFormState extends State<EditProductForm> {
     // ... Initialize other controllers as needed
   }
 
+
   @override
   Widget build(BuildContext context) {
     return Consumer(
@@ -285,5 +286,6 @@ class _EditProductFormState extends State<EditProductForm> {
     }
     return input;
   }
+
 
 }
