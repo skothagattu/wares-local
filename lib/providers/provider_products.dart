@@ -15,3 +15,10 @@ final updateProductProvider = FutureProvider.autoDispose.family<bool,Tuple2<Stri
   return await repository.updateProduct(tuple.item1, tuple.item2);
 });
 
+final createProductProvider = FutureProvider.autoDispose.family<bool, ProductSubmission>((ref, productSubmission) async {
+  final repository = ref.watch(productsRepositoryProvider);
+  return await repository.createProduct(productSubmission);
+});
+
+
+

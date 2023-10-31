@@ -8,6 +8,7 @@ import 'package:wares/models/products_submission.dart';
 abstract class IProductRepository {
   Future<ProductListResponse> fetchProductList({required int pageNumber, required int pageSize, String? searchQuery});
   Future<bool> updateProduct(String productNo, ProductSubmission productSubmission);
+  Future<bool> createProduct(ProductSubmission productSubmission);
 }
 
 class ProductRepository implements IProductRepository{
@@ -47,5 +48,21 @@ print(url);
     print('Status Code: ${response.statusCode}');
     print('Response Body: ${response.body}');
     return response.statusCode == 200|| response.statusCode == 204;  // Adjust as needed based on your API's response
+  }
+
+  @override
+  Future<bool> createProduct(ProductSubmission productSubmission) async {
+    final url = Uri.parse('$_host/CreateProduct'); // Adjust the URL as needed
+    final productMap = productSubmission.toJson();
+
+    final response = await http.post(
+      url,
+      headers: _headers,
+      body: json.encode(productMap),
+    );
+
+    print('Status Code: ${response.statusCode}');
+    print('Response Body: ${response.body}');
+    return response.statusCode == 201;  // Adjust as needed based on your API's response
   }
 }

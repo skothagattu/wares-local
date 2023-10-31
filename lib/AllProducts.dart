@@ -203,85 +203,52 @@ class _AllProductsState extends State<AllProducts> {
                                 ),),
                                 SizedBox(width: screenWidth *0.03),
                                 Flexible(child: SizedBox(
-                                    width: 200,
-                                    height: 70,
-                                    child: Column(
-                                      crossAxisAlignment: CrossAxisAlignment.start,
-                                      children: [
-                                        Text("REV"),
-                                        DropdownButton<String>(
-                                          value: selectedValue_Rev,
-                                          isExpanded: true,
+                                  width: 200,
 
-                                          items: dropdownItems_Rev,
-                                          onChanged: (value){
-                                            setState(() {
-                                              selectedValue_Rev = value!;
-                                            });
-                                          },
+                                  child:
+                                  TextFormField(
+                                    decoration: InputDecoration(
+                                      labelText: 'REV',
+                                      labelStyle: TextStyle(
+                                        fontWeight: FontWeight.bold,  // This makes the labelText bold
+                                      ),
 
-                                        )
-                                      ],
-
-                                    )
-
+                                    ),
+                                  ),
                                 ),),
-
-                                SizedBox(width: screenWidth *0.03),
-                                Flexible(
-                                    child: SizedBox(
-                                        width: 200,
-                                        height: 70,
-                                        child: Column(
-                                          crossAxisAlignment: CrossAxisAlignment.start,
-                                          children: [
-                                            Text("STATUS"),
-                                            DropdownButton<String>(
-                                              value: selectedValue_stat,
-                                              isExpanded: true,
-
-                                              items: dropdownItems_stat,
-                                              onChanged: (value){
-                                                setState(() {
-                                                  selectedValue_stat = value!;
-                                                });
-                                              },
-
-                                            )
-                                          ],
-
-                                        )
-
-                                    )
-
-
-                                ),
 
                                 SizedBox(width: screenWidth *0.03),
                                 Flexible(child: SizedBox(
-                                    width: 200,
+                                  width: 200,
 
-                                    child: Column(
-                                      crossAxisAlignment: CrossAxisAlignment.start,
-                                      children: [
-                                        Text("TYPE"),
-                                        DropdownButton<String>(
-                                          value: selectedValue_type,
-                                          isExpanded: true,
+                                  child:
+                                  TextFormField(
+                                    decoration: InputDecoration(
+                                      labelText: 'STATUS',
+                                      labelStyle: TextStyle(
+                                        fontWeight: FontWeight.bold,  // This makes the labelText bold
+                                      ),
 
-                                          items: dropdownItems_type,
-                                          onChanged: (value){
-                                            setState(() {
-                                              selectedValue_type = value!;
-                                            });
-                                          },
+                                    ),
+                                  ),
+                                ),
+                                ),
+                                SizedBox(width: screenWidth *0.03),
+                                Flexible(child: SizedBox(
+                                  width: 200,
 
-                                        )
-                                      ],
+                                  child:
+                                  TextFormField(
+                                    decoration: InputDecoration(
+                                      labelText: 'TYPE',
+                                      labelStyle: TextStyle(
+                                        fontWeight: FontWeight.bold,  // This makes the labelText bold
+                                      ),
 
-                                    )
-
-                                ),),
+                                    ),
+                                  ),
+                                ),
+                                ),
 
                                 SizedBox(width: screenWidth *0.03),
                                 Flexible(child: SizedBox(
@@ -419,32 +386,39 @@ class _AllProductsState extends State<AllProducts> {
                                   ),
                                 ),),
                                 SizedBox(width: screenWidth *0.03),
-                                Flexible(
-                                    child: SizedBox(
-                                        width: 200,
-                                        child: Column(
-                                          crossAxisAlignment: CrossAxisAlignment.start,
-                                          children: [
-                                            Text("COMPANY"),
-                                            DropdownButton<String>(
-                                              value: selectedValue_comp,
-                                              isExpanded: true,
+                                Flexible(child: SizedBox(
+                                  width: 200,
 
-                                              items: dropdownItems_comp,
-                                              onChanged: (value){
-                                                setState(() {
-                                                  selectedValue_comp = value!;
-                                                });
-                                              },
+                                  child:
+                                  TextFormField(
+                                    decoration: InputDecoration(
+                                      labelText: 'LLC',
+                                      labelStyle: TextStyle(
+                                        fontWeight: FontWeight.bold,  // This makes the labelText bold
+                                      ),
 
-                                            )
-                                          ],
-
-                                        )
-                                    )
+                                    ),
+                                  ),
+                                ),
 
 
                                 ),
+
+                                SizedBox(width: screenWidth *0.03),
+                                Flexible(child: SizedBox(
+                                  width: 200,
+
+                                  child:
+                                  TextFormField(
+                                    decoration: InputDecoration(
+                                      labelText: 'PRODUCT SPEC',
+                                      labelStyle: TextStyle(
+                                        fontWeight: FontWeight.bold,  // This makes the labelText bold
+                                      ),
+
+                                    ),
+                                  ),
+                                ),),
 
                                 SizedBox(width: screenWidth *0.03),
                                 Flexible(child: SizedBox(
@@ -454,7 +428,7 @@ class _AllProductsState extends State<AllProducts> {
                                     maxLines: null,
                                     keyboardType: TextInputType.multiline,
                                     decoration: InputDecoration(
-                                      labelText: 'ECR',
+                                      labelText: 'LEVEL 1',
                                       contentPadding: EdgeInsets.all(5),
                                       labelStyle: TextStyle(
                                         fontWeight: FontWeight.bold,  // This makes the labelText bold
@@ -472,7 +446,7 @@ class _AllProductsState extends State<AllProducts> {
                                     maxLines: null,
                                     keyboardType: TextInputType.multiline,
                                     decoration: InputDecoration(
-                                      labelText: 'COMMENTS',
+                                      labelText: 'LEVEL 2',
                                       contentPadding: EdgeInsets.all(5),
                                       labelStyle: TextStyle(
                                         fontWeight: FontWeight.bold,  // This makes the labelText bold
@@ -484,6 +458,207 @@ class _AllProductsState extends State<AllProducts> {
                               ],
                             ),
 
+                            SizedBox(height: screenWidth *0.01),
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.start,
+                              children: [
+                                SizedBox(width: screenWidth *0.03, height: 10,),
+                                Flexible(child: SizedBox(
+                                  width: 200,
+
+                                  child:
+                                  TextFormField(
+                                    decoration: InputDecoration(
+                                      labelText: 'LEVEL 3',
+                                      labelStyle: TextStyle(
+                                        fontWeight: FontWeight.bold,  // This makes the labelText bold
+                                      ),
+
+                                    ),
+                                  ),
+                                ),
+
+
+                                ),
+                                SizedBox(width: screenWidth *0.03),
+                                Flexible(child: SizedBox(
+                                  width: 200,
+
+                                  child:
+                                  TextFormField(
+                                    decoration: InputDecoration(
+                                      labelText: 'LEVEL 4',
+                                      labelStyle: TextStyle(
+                                        fontWeight: FontWeight.bold,  // This makes the labelText bold
+                                      ),
+
+                                    ),
+                                  ),
+                                ),
+
+
+                                ),
+
+                                SizedBox(width: screenWidth *0.03),
+                                Flexible(child: SizedBox(
+                                  width: 200,
+
+                                  child:
+                                  TextFormField(
+                                    decoration: InputDecoration(
+                                      labelText: 'LEVEL 5',
+                                      labelStyle: TextStyle(
+                                        fontWeight: FontWeight.bold,  // This makes the labelText bold
+                                      ),
+
+                                    ),
+                                  ),
+                                ),
+
+
+                                ),
+
+                                SizedBox(width: screenWidth *0.03),
+                                Flexible(child: SizedBox(
+                                  width: 200,
+
+                                  child:
+                                  TextFormField(
+                                    decoration: InputDecoration(
+                                      labelText: 'LEVEL 6',
+                                      labelStyle: TextStyle(
+                                        fontWeight: FontWeight.bold,  // This makes the labelText bold
+                                      ),
+
+                                    ),
+                                  ),
+                                ),
+
+
+                                ),
+
+                                SizedBox(width: screenWidth *0.03),
+                                Flexible(child: SizedBox(
+                                  width: 200,
+
+                                  child:
+                                  TextFormField(
+                                    decoration: InputDecoration(
+                                      labelText: 'LEVEL 7',
+                                      labelStyle: TextStyle(
+                                        fontWeight: FontWeight.bold,  // This makes the labelText bold
+                                      ),
+
+                                    ),
+                                  ),
+                                ),
+
+
+                                ),
+                              ],
+                            ),
+                            SizedBox(height: screenWidth *0.01),
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.start,
+                              children: [
+                                SizedBox(width: screenWidth *0.03, height: 10,),
+                                Flexible(child: SizedBox(
+                                  width: 200,
+
+                                  child:
+                                  TextFormField(
+                                    decoration: InputDecoration(
+                                      labelText: 'SEQUENCE NO',
+                                      labelStyle: TextStyle(
+                                        fontWeight: FontWeight.bold,  // This makes the labelText bold
+                                      ),
+
+                                    ),
+                                  ),
+                                ),
+
+
+                                ),
+                                SizedBox(width: screenWidth *0.03),
+                                Flexible(child: SizedBox(
+                                  width: 200,
+
+                                  child:
+                                  TextFormField(
+                                    decoration: InputDecoration(
+                                      labelText: 'Location Wares',
+                                      labelStyle: TextStyle(
+                                        fontWeight: FontWeight.bold,  // This makes the labelText bold
+                                      ),
+
+                                    ),
+                                  ),
+                                ),
+
+
+                                ),
+
+                                SizedBox(width: screenWidth *0.03),
+                                Flexible(child: SizedBox(
+                                  width: 200,
+
+                                  child:
+                                  TextFormField(
+                                    decoration: InputDecoration(
+                                      labelText: 'Location ACCPAC',
+                                      labelStyle: TextStyle(
+                                        fontWeight: FontWeight.bold,  // This makes the labelText bold
+                                      ),
+
+                                    ),
+                                  ),
+                                ),
+
+
+                                ),
+
+                                SizedBox(width: screenWidth *0.03),
+                                Flexible(child: SizedBox(
+                                  width: 200,
+
+                                  child:
+                                  TextFormField(
+                                    decoration: InputDecoration(
+                                      labelText: 'Location Misys',
+                                      labelStyle: TextStyle(
+                                        fontWeight: FontWeight.bold,  // This makes the labelText bold
+                                      ),
+
+                                    ),
+                                  ),
+                                ),
+
+
+                                ),
+
+                                SizedBox(width: screenWidth *0.03),
+                                Flexible(child: SizedBox(
+                                  width: 200,
+
+                                  child:
+                                  TextFormField(
+                                    decoration: InputDecoration(
+                                      labelText: 'Inst Guide',
+                                      labelStyle: TextStyle(
+                                        fontWeight: FontWeight.bold,  // This makes the labelText bold
+                                      ),
+
+                                    ),
+                                  ),
+                                ),
+
+
+                                ),
+                              ],
+                            ),
+
+
+
                           ],
                         ),
 
@@ -491,7 +666,7 @@ class _AllProductsState extends State<AllProducts> {
 
 
 
-                        Row(
+                        /*Row(
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
                             Center(
@@ -556,7 +731,7 @@ class _AllProductsState extends State<AllProducts> {
                               ],
                             ),
                           ],
-                        ),
+                        ),*/
 
                         SizedBox(height: screenWidth *0.03),
                         Column(
