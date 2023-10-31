@@ -18,7 +18,7 @@ class ProductRepository implements IProductRepository{
   };
 
   @override
-  Future<ProductListResponse> fetchProductList({int pageNumber = 1, int pageSize = 50, String? searchQuery}) async {
+  Future<ProductListResponse> fetchProductList({int pageNumber = 1, int pageSize = 15, String? searchQuery}) async {
     var getAllProductsUrl = _host + "/GetAll?pageNumber=$pageNumber&pageSize=$pageSize";
     if (searchQuery != null && searchQuery.isNotEmpty) {
       getAllProductsUrl += "&searchQuery=$searchQuery";

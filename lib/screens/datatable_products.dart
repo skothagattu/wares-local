@@ -52,7 +52,7 @@ class _ProductTableState extends State<ProductTable> {
       displayedProducts = newProducts.data.items;
     });
   }
-
+  TextEditingController _searchController = TextEditingController();
 
   @override
   Widget build(BuildContext context) {
@@ -69,6 +69,7 @@ class _ProductTableState extends State<ProductTable> {
               children : [
                 Expanded(child:
                 TextField(
+                  controller: _searchController,
                   onChanged: (value) {
                     setState(() {
                       _fetchProducts(searchQuery: value);
@@ -78,6 +79,15 @@ class _ProductTableState extends State<ProductTable> {
                     labelText: 'Search',
                     border: OutlineInputBorder(),
                     prefixIcon: Icon(Icons.search),
+                    suffixIcon: _searchController.text.isNotEmpty ? IconButton(
+                      icon: Icon(Icons.clear),
+                      onPressed: () {
+                        setState(() {
+                          _searchController.clear();
+                          _fetchProducts(searchQuery: '');
+                        });
+                      },
+                    ) : null,
                   ),
                 ),
                 ),
@@ -151,7 +161,16 @@ class _ProductTableState extends State<ProductTable> {
                           DataCell(Text(product.ecr ?? 'N/A')),
                           DataCell(
                               Text(product.listprice?.toString() ?? 'N/A')),
-                          DataCell(Text(product.comments ?? 'N/A')),
+                          DataCell(ConstrainedBox(
+                            constraints: BoxConstraints(
+                              maxWidth: 100, // Set this width to your preference
+                            ),
+                            child: Text(
+                              product.comments ?? 'N/A',
+                              overflow: TextOverflow.ellipsis,
+                              softWrap: true,
+                            ),
+                          ),),
                           DataCell(Text(product.active ?? 'N/A')),
                           DataCell(Text(product.labeL_DESC ?? 'N/A')),
                           DataCell(Text(product.producT_SPEC ?? 'N/A')),

@@ -137,7 +137,7 @@ class Product {
     description = json['description'];
     configuration = json['configuration'];
     llc = json['llc'];
-    leveL1 = json['level1'];
+    leveL1 = json['leveL1'];
     type = json['type'];
     ecr = json['ecr'];
     listprice = json['listprice'];

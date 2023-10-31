@@ -82,66 +82,35 @@ class _EditProductFormState extends State<EditProductForm> {
   final _formKey = GlobalKey<FormState>();
   final TextEditingController _dateController = TextEditingController();
 
-  Future<void> _selectDate(BuildContext context) async {
+  Future<void> _selectDateTime(BuildContext context, TextEditingController controller) async {
     DateTime? selectedDate = await showDatePicker(
       context: context,
       initialDate: DateTime.now(),
       firstDate: DateTime(2000),
       lastDate: DateTime(2101),
     );
-    if (selectedDate != null && selectedDate != DateTime.now()) {
-      _dateController.text = "${selectedDate.toLocal()}".split(' ')[0];
+
+    if (selectedDate != null) {
+      TimeOfDay? selectedTime = await showTimePicker(
+        context: context,
+        initialTime: TimeOfDay.now(),
+      );
+
+      if (selectedTime != null) {
+        DateTime selectedDateTime = DateTime(
+          selectedDate.year,
+          selectedDate.month,
+          selectedDate.day,
+          selectedTime.hour,
+          selectedTime.minute,
+        );
+
+        String formattedDateTime = "${selectedDateTime.toLocal()}".split('.')[0];
+        controller.text = formattedDateTime;
+      }
     }
   }
-  String selectedValue_Rev = 'A';
-  List<DropdownMenuItem<String>> get dropdownItems_Rev{
-    return[
-      DropdownMenuItem(child: Text("A"), value: 'A'),
-      DropdownMenuItem(child: Text("B"), value: 'B'),
-      DropdownMenuItem(child: Text("C"), value: 'C'),
-      DropdownMenuItem(child: Text("D"), value: 'D'),
-      DropdownMenuItem(child: Text("E"), value: 'E'),
 
-    ];
-  }
-  String selectedValue_stat = 'Active';
-  List<DropdownMenuItem<String>> get dropdownItems_stat{
-    return[
-      DropdownMenuItem(child: Text("Active"), value: 'Active'),
-      DropdownMenuItem(child: Text("Inactive"), value: 'Inactive'),
-
-    ];
-  }
-  String selectedValue_type = 'Active';
-  List<DropdownMenuItem<String>> get dropdownItems_type{
-    return[
-      DropdownMenuItem(child: Text("Active"), value: 'Active'),
-      DropdownMenuItem(child: Text("Inactive"), value: 'Inactive'),
-
-    ];
-  }
-  String selectedValue_comp = 'EVSE';
-  List<DropdownMenuItem<String>> get dropdownItems_comp{
-    return[
-      DropdownMenuItem(child: Text("CMI"), value: 'CMI'),
-      DropdownMenuItem(child: Text("EVSE"), value: 'EVSE'),
-
-    ];
-  }
-
-  final TextEditingController _dateControllerDue = TextEditingController();
-
-  Future<void> _selectDateDue(BuildContext context) async {
-    DateTime? selectedDate = await showDatePicker(
-      context: context,
-      initialDate: DateTime.now(),
-      firstDate: DateTime(2000),
-      lastDate: DateTime(2101),
-    );
-    if (selectedDate != null && selectedDate != DateTime.now()) {
-      _dateController.text = "${selectedDate.toLocal()}".split(' ')[0];
-    }
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -151,128 +120,7 @@ class _EditProductFormState extends State<EditProductForm> {
         return AlertDialog(
           title: Text('Edit Product'),
           content: SingleChildScrollView(
-            child:/* Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Row(
-                  children: [
-                    Text('ID: '),
-                    Text(widget.productSubmission.id?.toString() ?? 'N/A'),
-                  ],
-                ),
-                Row(
-                  children: [
-                    Text('Product No: '),
-                    Text(widget.productSubmission.productno ?? 'N/A'),
-                  ],
-                ),
-                TextField(
-                  controller: _revController,
-                  decoration: InputDecoration(labelText: 'Rev'),
-                ),
-                TextField(
-                  controller: _descriptionController,
-                  decoration: InputDecoration(labelText: 'Description'),
-                ),
-                TextField(
-                  controller: _configurationController,
-                  decoration: InputDecoration(labelText: 'Configuration'),
-                ),
-                TextField(
-                  controller: _llcController,
-                  decoration: InputDecoration(labelText: 'llc'),
-                ),
-                TextField(
-                  controller: _level1Controller,
-                  decoration: InputDecoration(labelText: 'level1'),
-                ),
-                TextField(
-                  controller: _typeController,
-                  decoration: InputDecoration(labelText: 'type'),
-                ),
-                TextField(
-                  controller: _ecrController,
-                  decoration: InputDecoration(labelText: 'ecr'),
-                ),
-                TextField(
-                  controller: _listpriceController,
-                  decoration: InputDecoration(labelText: 'listprice'),
-                ),
-                TextField(
-                  controller: _commentsController,
-                  decoration: InputDecoration(labelText: 'comments'),
-                ),
-                TextField(
-                  controller: _activeController,
-                  decoration: InputDecoration(labelText: 'active'),
-                ),
-                TextField(
-                  controller: _labelDescController,
-                  decoration: InputDecoration(labelText: 'labelDesc'),
-                ),
-                TextField(
-                  controller: _productSpecController,
-                  decoration: InputDecoration(labelText: 'productSpec'),
-                ),
-                TextField(
-                  controller: _labelConfigController,
-                  decoration: InputDecoration(labelText: 'labelConfig'),
-                ),
-                TextField(
-                  controller: _dateReqController,
-                  decoration: InputDecoration(labelText: 'dateReq'),
-                ),
-                TextField(
-                  controller: _dateDueController,
-                  decoration: InputDecoration(labelText: 'dateDue'),
-                ),
-                TextField(
-                  controller: _level2Controller,
-                  decoration: InputDecoration(labelText: 'leve2'),
-                ),
-                TextField(
-                  controller: _level3Controller,
-                  decoration: InputDecoration(labelText: 'level3'),
-                ),
-                TextField(
-                  controller: _level4Controller,
-                  decoration: InputDecoration(labelText: 'level4'),
-                ),
-                TextField(
-                  controller: _level5Controller,
-                  decoration: InputDecoration(labelText: 'level5'),
-                ),
-                TextField(
-                  controller: _sequenceNumController,
-                  decoration: InputDecoration(labelText: 'sequenceNum'),
-                ),
-                TextField(
-                  controller: _locationWaresController,
-                  decoration: InputDecoration(labelText: 'locationWares'),
-                ),
-                TextField(
-                  controller: _locationAccpacController,
-                  decoration: InputDecoration(labelText: 'locationAccpac'),
-                ),
-                TextField(
-                  controller: _locationMisysController,
-                  decoration: InputDecoration(labelText: 'locationMisys'),
-                ),
-                TextField(
-                  controller: _level6Controller,
-                  decoration: InputDecoration(labelText: 'level6'),
-                ),
-                TextField(
-                  controller: _level7Controller,
-                  decoration: InputDecoration(labelText: 'level7'),
-                ),
-                TextField(
-                  controller: _instGuideController,
-                  decoration: InputDecoration(labelText: 'instGuide'),
-                ),
-                // ... Add TextFields for other fields as needed
-              ],
-            ),*/
+            child:
             Container(
               padding: const EdgeInsets.all(8.0),
               child: Form(
@@ -288,84 +136,53 @@ class _EditProductFormState extends State<EditProductForm> {
                       Text(widget.productSubmission.productno ?? 'N/A'),
                       SizedBox(width: screenWidth *0.05),
                       Flexible(child: SizedBox(
-                          width: 200,
-                          height: 70,
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text("REV"),
-                              DropdownButton<String>(
-                                value: selectedValue_Rev,
-                                isExpanded: true,
-
-                                items: dropdownItems_Rev,
-                                onChanged: (value){
-                                  setState(() {
-                                    selectedValue_Rev = value!;
-                                  });
-                                },
-
-                              )
-                            ],
-
-                          )
-
+                        width: 200,
+                        child:
+                        TextFormField(
+                          controller: _revController,
+                          maxLines: null,
+                          keyboardType: TextInputType.multiline,
+                          decoration: InputDecoration(
+                            labelText: 'REV',
+                            labelStyle: TextStyle(
+                              fontWeight: FontWeight.bold,  // This makes the labelText bold
+                            ),
+                          ),
+                        ),
                       ),),
 
                       SizedBox(width: screenWidth *0.03),
-                      Flexible(
-                          child: SizedBox(
-                              width: 200,
-                              height: 70,
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Text("STATUS"),
-                                  DropdownButton<String>(
-                                    value: selectedValue_stat,
-                                    isExpanded: true,
-
-                                    items: dropdownItems_stat,
-                                    onChanged: (value){
-                                      setState(() {
-                                        selectedValue_stat = value!;
-                                      });
-                                    },
-
-                                  )
-                                ],
-
-                              )
-
-                          )
-
-
-                      ),
+                      Flexible(child: SizedBox(
+                        width: 200,
+                        child:
+                        TextFormField(
+                          controller: _activeController,
+                          maxLines: null,
+                          keyboardType: TextInputType.multiline,
+                          decoration: InputDecoration(
+                            labelText: 'STATUS',
+                            labelStyle: TextStyle(
+                              fontWeight: FontWeight.bold,  // This makes the labelText bold
+                            ),
+                          ),
+                        ),
+                      ),),
 
                       SizedBox(width: screenWidth *0.03),
                       Flexible(child: SizedBox(
-                          width: 200,
-
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text("TYPE"),
-                              DropdownButton<String>(
-                                value: selectedValue_type,
-                                isExpanded: true,
-
-                                items: dropdownItems_type,
-                                onChanged: (value){
-                                  setState(() {
-                                    selectedValue_type = value!;
-                                  });
-                                },
-
-                              )
-                            ],
-
-                          )
-
+                        width: 200,
+                        child:
+                        TextFormField(
+                          controller: _typeController,
+                          maxLines: null,
+                          keyboardType: TextInputType.multiline,
+                          decoration: InputDecoration(
+                            labelText: 'TYPE',
+                            labelStyle: TextStyle(
+                              fontWeight: FontWeight.bold,  // This makes the labelText bold
+                            ),
+                          ),
+                        ),
                       ),),
 
                       SizedBox(width: screenWidth *0.03),
@@ -467,7 +284,7 @@ class _EditProductFormState extends State<EditProductForm> {
                             width: 200,
                             child:
                             GestureDetector(
-                              onTap: () => _selectDate(context),
+                              onTap: () => _selectDateTime(context, _dateReqController),
                               child: AbsorbPointer(
                                 child: TextFormField(
                                   controller: _dateReqController,
@@ -493,7 +310,7 @@ class _EditProductFormState extends State<EditProductForm> {
                             width: 200,
                             child:
                             GestureDetector(
-                              onTap: () => _selectDate(context),
+                              onTap: () => _selectDateTime(context, _dateDueController),
                               child: AbsorbPointer(
                                 child: TextFormField(
                                   controller: _dateDueController,
