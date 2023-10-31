@@ -6,7 +6,7 @@ import 'package:http/http.dart' as http;
 import 'package:wares/models/products_submission.dart';
 
 abstract class IProductRepository {
-  Future<ProductListResponse> fetchProductList();
+  Future<ProductListResponse> fetchProductList({required int pageNumber, required int pageSize, String? searchQuery});
   Future<bool> updateProduct(String productNo, ProductSubmission productSubmission);
 }
 

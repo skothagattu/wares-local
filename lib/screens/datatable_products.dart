@@ -23,12 +23,14 @@ class _ProductTableState extends State<ProductTable> {
   final scrollController = ScrollController();
   String searchQuery = "";
 
+
   @override
   void initState() {
     super.initState();
     displayedProducts = List.from(widget.products);
     _fetchProducts();
   }
+
 
   _loadMoreProducts() async {
     currentPage++;
@@ -44,6 +46,13 @@ class _ProductTableState extends State<ProductTable> {
       displayedProducts = newProducts.data.items;
     });
   }
+  Future<void> _refreshProducts() async {
+    var newProducts = await ProductRepository().fetchProductList();
+    setState(() {
+      displayedProducts = newProducts.data.items;
+    });
+  }
+
 
   @override
   Widget build(BuildContext context) {
@@ -55,17 +64,38 @@ class _ProductTableState extends State<ProductTable> {
         children: [
           Padding(
             padding: const EdgeInsets.all(8.0),
-            child: TextField(
-              onChanged: (value) {
-                setState(() {
-                  _fetchProducts(searchQuery: value);
-                });
-              },
-              decoration: InputDecoration(
-                labelText: 'Search',
-                border: OutlineInputBorder(),
-                prefixIcon: Icon(Icons.search),
-              ),
+            child:
+            Row(
+              children : [
+                Expanded(child:
+                TextField(
+                  onChanged: (value) {
+                    setState(() {
+                      _fetchProducts(searchQuery: value);
+                    });
+                  },
+                  decoration: InputDecoration(
+                    labelText: 'Search',
+                    border: OutlineInputBorder(),
+                    prefixIcon: Icon(Icons.search),
+                  ),
+                ),
+                ),
+
+                InkWell(
+                  onTap: _refreshProducts,
+                  child: Container(
+                    padding: EdgeInsets.all(8.0),
+                    child: Column(
+                      children: [
+                        Icon(Icons.refresh),
+                        Text('Refresh'),
+                      ],
+                    ),
+                  ),
+                ),
+                ]
+
             ),
           ),
           Expanded(

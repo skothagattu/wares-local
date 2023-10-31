@@ -7,10 +7,11 @@ import 'package:wares/models/products_submission.dart';
 final productsRepositoryProvider = Provider<IProductRepository>((ref)=> ProductRepository());
 final productList = FutureProvider.autoDispose<ProductListResponse>((ref) async{
   final repository = ref.watch(productsRepositoryProvider);
-  return repository.fetchProductList();
+  return repository.fetchProductList(pageNumber: 1, pageSize: 50);
 });
 
 final updateProductProvider = FutureProvider.autoDispose.family<bool,Tuple2<String, ProductSubmission>>((ref, tuple) async {
   final repository = ref.watch(productsRepositoryProvider);
   return await repository.updateProduct(tuple.item1, tuple.item2);
 });
+
