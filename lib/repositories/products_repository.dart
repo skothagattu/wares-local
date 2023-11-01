@@ -44,9 +44,6 @@ print(url);
       body: json.encode(productMap),
      // Ensure your Product model has a toJson method
     );
-
-    print('Status Code: ${response.statusCode}');
-    print('Response Body: ${response.body}');
     return response.statusCode == 200|| response.statusCode == 204;  // Adjust as needed based on your API's response
   }
 
@@ -54,7 +51,7 @@ print(url);
   Future<bool> createProduct(ProductSubmission productSubmission) async {
     final url = Uri.parse('$_host/CreateProduct'); // Adjust the URL as needed
     final productMap = productSubmission.toJson();
-
+    print(url);
     final response = await http.post(
       url,
       headers: _headers,

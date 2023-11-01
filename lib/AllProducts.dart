@@ -171,32 +171,7 @@ class _AllProductsState extends State<AllProducts> {
     }
   }
 
-/*  final TextEditingController _dateController = TextEditingController();
 
-  Future<void> _selectDate(BuildContext context) async {
-    DateTime? selectedDate = await showDatePicker(
-      context: context,
-      initialDate: DateTime.now(),
-      firstDate: DateTime(2000),
-      lastDate: DateTime(2101),
-    );
-    if (selectedDate != null && selectedDate != DateTime.now()) {
-      _dateController.text = "${selectedDate.toLocal()}".split(' ')[0];
-    }
-  }
-  final TextEditingController _dateControllerDue = TextEditingController();
-
-  Future<void> _selectDateDue(BuildContext context) async {
-    DateTime? selectedDate = await showDatePicker(
-      context: context,
-      initialDate: DateTime.now(),
-      firstDate: DateTime(2000),
-      lastDate: DateTime(2101),
-    );
-    if (selectedDate != null && selectedDate != DateTime.now()) {
-      _dateController.text = "${selectedDate.toLocal()}".split(' ')[0];
-    }
-  }*/
   void navigateLookUp(BuildContext ctx){
     Navigator.of(ctx).push(MaterialPageRoute(builder: (_){
       return LookupListScreen();
@@ -823,7 +798,7 @@ class _AllProductsState extends State<AllProducts> {
                                             instGuide: _emptyToNull(instGuideController.text),
                                             // ... Set other fields as needed
                                           );
-
+                                          print('created product: $createProductSubmission');
                                           ref.read(createProductProvider(createProductSubmission).future).then((success) {
                                             if (success) {
                                               Navigator.of(context).pop();

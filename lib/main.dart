@@ -60,6 +60,7 @@ class _MyAppState extends State<MyApp>{
           appBarTheme: const AppBarTheme(
             centerTitle: true,
             toolbarHeight: 100,
+            color: Colors.blue,
 
           ),
           elevatedButtonTheme: ElevatedButtonThemeData(
