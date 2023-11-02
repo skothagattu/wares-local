@@ -1,5 +1,6 @@
 import 'dart:convert';
 
+import 'package:tuple/tuple.dart';
 import 'package:wares/models/products.dart';
 
 import 'package:http/http.dart' as http;
@@ -9,6 +10,7 @@ abstract class IProductRepository {
   Future<ProductListResponse> fetchProductList({required int pageNumber, required int pageSize, String? searchQuery});
   Future<bool> updateProduct(String productNo, ProductSubmission productSubmission);
   Future<bool> createProduct(ProductSubmission productSubmission);
+  Future<Tuple2<bool, Product?>> checkProduct(String productNo);
 }
 
 class ProductRepository implements IProductRepository{
@@ -62,4 +64,27 @@ print(url);
     print('Response Body: ${response.body}');
     return response.statusCode == 201;  // Adjust as needed based on your API's response
   }
+
+  @override
+  Future<Tuple2<bool, Product?>> checkProduct(String productNo) async {
+    final url = Uri.parse('$_host/$productNo');
+    try {
+      final response = await http.get(url, headers: _headers);
+      if (response.statusCode == 200) {
+        final product = Product.fromJson(json.decode(response.body));
+        return Tuple2(true, product);
+      } else if (response.statusCode == 404) {
+        return const Tuple2(false, null);
+      } else {
+        // Handle other HTTP status codes as needed
+        print('Error checking product: ${response.body}');
+        return const Tuple2(false, null);
+      }
+    } catch (e) {
+      print('Error checking product: $e');
+      return const Tuple2(false, null);
+    }
+  }
+
 }
+

@@ -2,12 +2,15 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:wares/providers/provider_products.dart';
+import 'package:wares/repositories/products_repository.dart';
+import 'package:wares/screens/edit_products_form.dart';
 import 'package:wares/screens/lookup_list_screen.dart';
 import 'package:wares/theme/theme_manager.dart';
 import 'main.dart';
+import 'models/products.dart';
 import 'models/products_submission.dart';
 ThemeManager _themeManager = ThemeManager();
-class AllProducts extends StatefulWidget {
+class AllProducts extends ConsumerStatefulWidget  {
 /*  const AllProducts({Key? key}) : super(key: key);*/
   void navigateBack(BuildContext ctx){
     Navigator.of(ctx).push(MaterialPageRoute(builder: (_){
@@ -18,34 +21,13 @@ class AllProducts extends StatefulWidget {
   final ProductSubmission productSubmission = ProductSubmission(
     // Initialize with default values or fetch from an API if needed
   );
+
+
   @override
-  State<AllProducts> createState() => _AllProductsState();
+  ConsumerState<ConsumerStatefulWidget> createState() => _AllProductsState();
 }
 
-class _AllProductsState extends State<AllProducts> {
-/*  String? productno;
-  String? rev;
-  String? description;
-  String? configuration;
-  int? llc;
-  String? leveL1;
-  String? type;
-  String? comments;
-  String? active;
-  String? labeLDESC;
-  String? producTSPEC;
-  String? labeLCONFIG;
-  String? datEREQ;
-  String? datEDUE;
-  String? leveL2;
-  String? leveL3;
-  String? leveL4;
-  String? leveL5;
-  String? sequencENUM;String? locatioNWARES;String? locatioNACCPAC;
-  String? locatioNMISYS;
-  String? leveL6;
-  String? leveL7;
-  String? insTGUIDE;*/
+class _AllProductsState extends ConsumerState<AllProducts> {
   late TextEditingController productNoController;
   late TextEditingController revController;
   late TextEditingController statusController;
@@ -74,6 +56,7 @@ class _AllProductsState extends State<AllProducts> {
   late TextEditingController locationMisysController;
   late TextEditingController instGuideController;
   // Add more controllers as needed
+  late FocusNode productNoFocusNode;
   @override
   void initState() {
     super.initState();
@@ -106,6 +89,11 @@ class _AllProductsState extends State<AllProducts> {
     instGuideController = TextEditingController(text: widget.productSubmission.instGuide);
 
     // ... Initialize other controllers as needed
+    productNoFocusNode = FocusNode();
+    productNoFocusNode.addListener(() {
+      // Pass the ref to the _onProductNoFocusChange function
+      _onProductNoFocusChange(ref);
+    });
   }
   @override
   void dispose() {
@@ -138,9 +126,84 @@ class _AllProductsState extends State<AllProducts> {
     locationMisysController.dispose();
     instGuideController.dispose();
 
-
+    productNoFocusNode = FocusNode();
+    productNoFocusNode.addListener(() {
+      _onProductNoFocusChange(ref);
+    });
+    // ... dispose other resources
     super.dispose();
   }
+
+  bool _isProductNumberValid = false;
+  void _onProductNoFocusChange(WidgetRef ref) async {
+    if (!productNoFocusNode.hasFocus) {
+      final productNumber = productNoController.text;
+      if (productNumber.isNotEmpty) {
+        final productCheckResult = await ref.read(checkProductProvider(productNumber).future);
+        if (productCheckResult.item1) {
+          // Product number exists, show dialog and set _isProductNumberValid to false
+          setState(() {
+            _isProductNumberValid = false;
+          });
+          _showProductExistsDialog(productCheckResult.item2);
+        } else {
+          // Product number does not exist, set _isProductNumberValid to true
+          setState(() {
+            _isProductNumberValid = true;
+          });
+        }
+      } else {
+        // Product number is empty, set _isProductNumberValid to false
+        setState(() {
+          _isProductNumberValid = false;
+        });
+      }
+    }
+  }
+
+
+
+
+
+
+  void _showProductExistsDialog(Product? product) {
+    if (product != null) {
+      showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          return AlertDialog(
+            title: Text('Product Exists'),
+            content: Text('This product already exists. Do you want to edit it?'),
+            actions: <Widget>[
+              TextButton(
+                onPressed: () async {
+                  Navigator.of(context).pop();
+                  ProductSubmission productSubmission = ProductSubmission.fromProduct(product);
+                  final result = await showDialog(
+                    context: context,
+                    builder: (context) => EditProductForm(productSubmission: productSubmission),
+                  );
+                  if (result == 'clearProductNumber') {
+                    productNoController.clear();
+                  }
+                },
+                child: Text('Yes'),
+              ),
+              TextButton(
+                onPressed: () {
+                  Navigator.of(context).pop();
+                  productNoController.clear();
+                },
+                child: Text('No'),
+              ),
+            ],
+          );
+        },
+      );
+    }
+  }
+
+
 
   Future<void> _selectDateTime(BuildContext context, TextEditingController controller) async {
     DateTime? selectedDate = await showDatePicker(
@@ -170,6 +233,65 @@ class _AllProductsState extends State<AllProducts> {
       }
     }
   }
+/*
+  Future<void> _checkProductNumber(String productNo, WidgetRef ref) async {
+    if (productNo.isNotEmpty) {
+      // Use the provider to check the product
+      final result = await ref.read(checkProductProvider(productNo).future);
+
+      if (result.item1) {
+        // Product exists
+        showDialog(
+          context: context,
+          builder: (BuildContext context) {
+            return AlertDialog(
+              title: Text('Product Exists'),
+              content: Text('This product already exists. Do you want to edit it?'),
+              actions: <Widget>[
+                TextButton(
+                  onPressed: () {
+                    Navigator.of(context).pop();
+                    // Navigate to edit product page or perform edit action
+                    // You can use result.item2 to get the product details
+                  },
+                  child: Text('Yes'),
+                ),
+                TextButton(
+                  onPressed: () {
+                    Navigator.of(context).pop();
+                    productNoController.clear();
+                  },
+                  child: Text('No'),
+                ),
+              ],
+            );
+          },
+        );
+      } else {
+        // Product does not exist
+        showDialog(
+          context: context,
+          builder: (BuildContext context) {
+            return AlertDialog(
+              title: Text('Product Available'),
+              content: Text('The product number is available.'),
+              actions: <Widget>[
+                TextButton(
+                  onPressed: () {
+                    Navigator.of(context).pop();
+                  },
+                  child: Text('OK'),
+                ),
+              ],
+            );
+          },
+        );
+      }
+    }
+  }
+*/
+
+
 
 
   void navigateLookUp(BuildContext ctx){
@@ -257,20 +379,23 @@ class _AllProductsState extends State<AllProducts> {
                                   mainAxisAlignment: MainAxisAlignment.start,
                                   children: [
 
-                                    SizedBox(width: screenWidth *0.03),
+                                    SizedBox(width: screenWidth *0.03, height: 10,),
                                     Flexible(child: SizedBox(
                                       width: 200,
 
                                       child:
                                       TextFormField(
                                         controller: productNoController,
+                                        focusNode: productNoFocusNode,
                                         decoration: InputDecoration(
                                           labelText: 'PRODUCT NUMBER',
                                           labelStyle: TextStyle(
                                             fontWeight: FontWeight.bold,  // This makes the labelText bold
                                           ),
+                                          suffixIcon: _isProductNumberValid ? Icon(Icons.check_circle, color: Colors.green) : null,
 
                                         ),
+
                                       ),
                                     ),),
                                     SizedBox(width: screenWidth *0.03),
@@ -346,22 +471,20 @@ class _AllProductsState extends State<AllProducts> {
                                   ],
                                 ),
 
-
-
                                 SizedBox(height: screenWidth *0.01),
                                 Row(
                                   mainAxisAlignment: MainAxisAlignment.start,
                                   children: [
-                                    SizedBox(width: screenWidth *0.03),
+                                    SizedBox(width: screenWidth *0.03, height: 10,),
                                     Flexible(child: SizedBox(
-                                      width: 200,
+                                      width: screenWidth*0.3,
                                       child:
                                       TextFormField(
                                         controller: labelDescController,
                                         maxLines: null,
                                         keyboardType: TextInputType.multiline,
                                         decoration: InputDecoration(
-                                          labelText: 'LABEL_DESC',
+                                          labelText: 'LABEL DESCRIPTION',
                                           labelStyle: TextStyle(
                                             fontWeight: FontWeight.bold,  // This makes the labelText bold
                                           ),
@@ -370,7 +493,7 @@ class _AllProductsState extends State<AllProducts> {
                                     ),),
                                     SizedBox(width: screenWidth *0.03),
                                     Flexible(child: SizedBox(
-                                      width: 200,
+                                      width: screenWidth*0.3,
                                       child:
                                       TextFormField(
                                         controller: configurationController,
@@ -387,14 +510,14 @@ class _AllProductsState extends State<AllProducts> {
 
                                     SizedBox(width: screenWidth *0.03),
                                     Flexible(child: SizedBox(
-                                      width: 200,
+                                      width: screenWidth*0.3,
                                       child:
                                       TextFormField(
                                         controller: labelConfigController,
                                         maxLines: null,
                                         keyboardType: TextInputType.multiline,
                                         decoration: InputDecoration(
-                                          labelText: 'LABEL_CONFIG',
+                                          labelText: 'LABEL CONFIGURATION',
                                           labelStyle: TextStyle(
                                             fontWeight: FontWeight.bold,  // This makes the labelText bold
                                           ),
@@ -404,14 +527,14 @@ class _AllProductsState extends State<AllProducts> {
 
                                     SizedBox(width: screenWidth *0.03),
                                     Flexible(child: SizedBox(
-                                      width: 200,
+                                      width: screenWidth*0.3,
                                       child:
                                       TextFormField(
                                         controller: listpriceController,
                                         maxLines: null,
                                         keyboardType: TextInputType.multiline,
                                         decoration: InputDecoration(
-                                          labelText: 'LIST_PRICE',
+                                          labelText: 'LIST PRICE',
                                           labelStyle: TextStyle(
                                             fontWeight: FontWeight.bold,  // This makes the labelText bold
                                           ),
@@ -421,7 +544,7 @@ class _AllProductsState extends State<AllProducts> {
 
                                     SizedBox(width: screenWidth *0.03),
                                     Flexible(child: SizedBox(
-                                      width: 200,
+                                      width: screenWidth*0.3,
                                       child:
                                       GestureDetector(
                                         onTap: () => _selectDateTime(context, dateReqController),
@@ -429,7 +552,7 @@ class _AllProductsState extends State<AllProducts> {
                                           child: TextFormField(
                                             controller: dateReqController,
                                             decoration: InputDecoration(
-                                                labelText: 'DATE_REQ',
+                                                labelText: 'DATE REQUIRED',
                                                 labelStyle: TextStyle(
                                                   fontWeight: FontWeight.bold,
                                                 )
@@ -447,16 +570,17 @@ class _AllProductsState extends State<AllProducts> {
                                   children: [
                                     SizedBox(width: screenWidth *0.03, height: 10,),
                                     Flexible(child: SizedBox(
-                                      width: 200,
-
+                                      width: screenWidth*0.3,
                                       child:
                                       GestureDetector(
                                         onTap: () => _selectDateTime(context, dateDueController),
                                         child: AbsorbPointer(
                                           child: TextFormField(
+                                            maxLines: null,
+                                            keyboardType: TextInputType.multiline,
                                             controller: dateDueController,
                                             decoration: InputDecoration(
-                                                labelText: 'DATE_REQ',
+                                                labelText: 'DATE DUE',
                                                 labelStyle: TextStyle(
                                                   fontWeight: FontWeight.bold,
                                                 )
@@ -467,11 +591,13 @@ class _AllProductsState extends State<AllProducts> {
                                     ),),
                                     SizedBox(width: screenWidth *0.03),
                                     Flexible(child: SizedBox(
-                                      width: 200,
+                                      width: screenWidth*0.3,
 
                                       child:
                                       TextFormField(
                                         controller: llcController,
+                                        maxLines: null,
+                                        keyboardType: TextInputType.multiline,
                                         decoration: InputDecoration(
                                           labelText: 'LLC',
                                           labelStyle: TextStyle(
@@ -487,13 +613,15 @@ class _AllProductsState extends State<AllProducts> {
 
                                     SizedBox(width: screenWidth *0.03),
                                     Flexible(child: SizedBox(
-                                      width: 200,
+                                      width: screenWidth*0.3,
 
                                       child:
                                       TextFormField(
+                                        maxLines: null,
+                                        keyboardType: TextInputType.multiline,
                                         controller: productSpecController,
                                         decoration: InputDecoration(
-                                          labelText: 'PRODUCT SPEC',
+                                          labelText: 'PRODUCT SPECIFICATION',
                                           labelStyle: TextStyle(
                                             fontWeight: FontWeight.bold,  // This makes the labelText bold
                                           ),
@@ -504,7 +632,7 @@ class _AllProductsState extends State<AllProducts> {
 
                                     SizedBox(width: screenWidth *0.03),
                                     Flexible(child: SizedBox(
-                                      width: 200,
+                                      width: screenWidth*0.3,
                                       child:
                                       TextFormField(
                                         controller: level1Controller,
@@ -512,7 +640,6 @@ class _AllProductsState extends State<AllProducts> {
                                         keyboardType: TextInputType.multiline,
                                         decoration: InputDecoration(
                                           labelText: 'LEVEL 1',
-                                          contentPadding: EdgeInsets.all(5),
                                           labelStyle: TextStyle(
                                             fontWeight: FontWeight.bold,  // This makes the labelText bold
                                           ),
@@ -523,7 +650,7 @@ class _AllProductsState extends State<AllProducts> {
 
                                     SizedBox(width: screenWidth *0.03),
                                     Flexible(child: SizedBox(
-                                      width: 200,
+                                      width: screenWidth*0.3,
                                       child:
                                       TextFormField(
                                         controller: level2Controller,
@@ -531,7 +658,6 @@ class _AllProductsState extends State<AllProducts> {
                                         keyboardType: TextInputType.multiline,
                                         decoration: InputDecoration(
                                           labelText: 'LEVEL 2',
-                                          contentPadding: EdgeInsets.all(5),
                                           labelStyle: TextStyle(
                                             fontWeight: FontWeight.bold,  // This makes the labelText bold
                                           ),
@@ -539,6 +665,7 @@ class _AllProductsState extends State<AllProducts> {
                                         ),
                                       ),
                                     ),),
+                                    SizedBox(width: screenWidth *0.03),
                                   ],
                                 ),
 
@@ -644,6 +771,7 @@ class _AllProductsState extends State<AllProducts> {
 
 
                                     ),
+                                    SizedBox(width: screenWidth *0.03),
                                   ],
                                 ),
                                 SizedBox(height: screenWidth *0.01),
@@ -677,7 +805,7 @@ class _AllProductsState extends State<AllProducts> {
                                       TextFormField(
                                         controller: locationWaresController,
                                         decoration: InputDecoration(
-                                          labelText: 'Location Wares',
+                                          labelText: 'LOCATION WARES',
                                           labelStyle: TextStyle(
                                             fontWeight: FontWeight.bold,  // This makes the labelText bold
                                           ),
@@ -697,7 +825,7 @@ class _AllProductsState extends State<AllProducts> {
                                       TextFormField(
                                         controller: locationAccpacController,
                                         decoration: InputDecoration(
-                                          labelText: 'Location ACCPAC',
+                                          labelText: 'LOCATION ACCPAC',
                                           labelStyle: TextStyle(
                                             fontWeight: FontWeight.bold,  // This makes the labelText bold
                                           ),
@@ -717,7 +845,7 @@ class _AllProductsState extends State<AllProducts> {
                                       TextFormField(
                                         controller: locationMisysController,
                                         decoration: InputDecoration(
-                                          labelText: 'Location Misys',
+                                          labelText: 'LOCATION MISYS',
                                           labelStyle: TextStyle(
                                             fontWeight: FontWeight.bold,  // This makes the labelText bold
                                           ),
@@ -737,7 +865,7 @@ class _AllProductsState extends State<AllProducts> {
                                       TextFormField(
                                         controller: instGuideController,
                                         decoration: InputDecoration(
-                                          labelText: 'Inst Guide',
+                                          labelText: 'INST GUIDE',
                                           labelStyle: TextStyle(
                                             fontWeight: FontWeight.bold,  // This makes the labelText bold
                                           ),
@@ -748,6 +876,7 @@ class _AllProductsState extends State<AllProducts> {
 
 
                                     ),
+                                    SizedBox(width: screenWidth *0.03),
                                   ],
                                 ),
 

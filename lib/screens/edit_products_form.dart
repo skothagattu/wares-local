@@ -694,7 +694,7 @@ class _EditProductFormState extends State<EditProductForm> {
 
                 ref.read(updateProductProvider(Tuple2(productNo, UpdateProductSubmission)).future).then((success) {
                   if (success) {
-                    Navigator.of(context).pop();
+                    Navigator.of(context).pop('clearProductNumber');
                     ScaffoldMessenger.of(context).showSnackBar(
                       SnackBar(content: Text('Product updated successfully!')),
                     );
