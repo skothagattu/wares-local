@@ -886,7 +886,8 @@ class _AllProductsState extends ConsumerState<AllProducts> {
                             ),
 
                             SizedBox(height: screenWidth *0.03),
-                            Column(
+                            Row(
+                                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                               children: [
                                 Padding(padding: EdgeInsets.only(
                                   bottom: MediaQuery.of(context).size.height *0.02,
@@ -950,6 +951,49 @@ class _AllProductsState extends ConsumerState<AllProducts> {
                                       child: Text('Submit'),
                                     ),
 
+                                  ),
+
+
+                                ),
+                                Container(
+                                  width: screenWidth * 0.2,
+                                  height: MediaQuery.of(context).size.height * 0.05,
+                                  child: ElevatedButton(
+                                    onPressed: () {
+                                      // Clear all the text controllers
+                                      productNoController.clear();
+                                      revController.clear();
+                                      descriptionController.clear();
+                                      configurationController.clear();
+                                      llcController.clear();
+                                      level1Controller.clear();
+                                      typeController.clear();
+                                      ecrController.clear();
+                                      listpriceController.clear();
+                                      commentsController.clear();
+                                      statusController.clear();
+                                      labelDescController.clear();
+                                      productSpecController.clear();
+                                      labelConfigController.clear();
+                                      dateReqController.clear();
+                                      dateDueController.clear();
+                                      level2Controller.clear();
+                                      level3Controller.clear();
+                                      level4Controller.clear();
+                                      level5Controller.clear();
+                                      sequenceNumController.clear();
+                                      locationWaresController.clear();
+                                      locationAccpacController.clear();
+                                      locationMisysController.clear();
+                                      level6Controller.clear();
+                                      level7Controller.clear();
+                                      instGuideController.clear();
+                                      // Set _isProductNumberValid to false
+                                      setState(() {
+                                        _isProductNumberValid = false;
+                                      });
+                                    },
+                                    child: Text('Clear'),
                                   ),
                                 ),
                               ],

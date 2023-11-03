@@ -651,7 +651,7 @@ class _EditProductFormState extends State<EditProductForm> {
           actions: [
             TextButton(
               onPressed: () {
-                Navigator.of(context).pop();
+                Navigator.of(context).pop('clearProductNumber');
               },
               child: Text('Cancel'),
             ),
