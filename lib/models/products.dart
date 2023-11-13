@@ -97,6 +97,7 @@ class Product {
     this.leveL6,
     this.leveL7,
     this.insT_GUIDE,
+    this.rowVersion,
   });
 
   late final int id;
@@ -128,6 +129,7 @@ class Product {
   late final String? leveL6;
   late final String? leveL7;
   late final String? insT_GUIDE;
+  late final String? rowVersion;
 
   Product.fromJson(Map<String, dynamic> json) {
     id = json['id'];
@@ -159,6 +161,8 @@ class Product {
     leveL6 = json['leveL6'];
     leveL7 = json['leveL7'];
     insT_GUIDE = json['insT_GUIDE'];
+    rowVersion = json['rowVersion'];
+
   }
 
   Map<String, dynamic> toJson() {
@@ -192,12 +196,13 @@ class Product {
     _data['leveL6'] = leveL6;
     _data['leveL7'] = leveL7;
     _data['insT_GUIDE'] = insT_GUIDE;
+    _data['rowVersion'] = rowVersion;
     return _data;
 
 
   }
   @override
   String toString() {
-    return 'Product{id: $id, productno: $productno, rev: $rev, description: $description, configuration: $configuration, llc: $llc, level1: $leveL1, type: $type, ecr: $ecr, listprice: $listprice, comments: $comments, active: $active, labelDesc: $labeL_DESC, productSpec: $producT_SPEC, labelConfig: $labeL_CONFIG, dateReq: $datE_REQ, dateDue: $datE_DUE, level2: $leveL2, level3: $leveL3, level4: $leveL4, level5: $leveL5, sequenceNum: $sequencE_NUM, locationWares: $locatioN_WARES, locationAccpac: $locatioN_ACCPAC, locationMisys: $locatioN_MISYS, level6: $leveL6, level7: $leveL7, instGuide: $insT_GUIDE}';
+    return 'Product{id: $id, productno: $productno, rev: $rev, description: $description, configuration: $configuration, llc: $llc, level1: $leveL1, type: $type, ecr: $ecr, listprice: $listprice, comments: $comments, active: $active, labelDesc: $labeL_DESC, productSpec: $producT_SPEC, labelConfig: $labeL_CONFIG, dateReq: $datE_REQ, dateDue: $datE_DUE, level2: $leveL2, level3: $leveL3, level4: $leveL4, level5: $leveL5, sequenceNum: $sequencE_NUM, locationWares: $locatioN_WARES, locationAccpac: $locatioN_ACCPAC, locationMisys: $locatioN_MISYS, level6: $leveL6, level7: $leveL7, instGuide: $insT_GUIDE, rowVersion: $rowVersion}';
   }
 }

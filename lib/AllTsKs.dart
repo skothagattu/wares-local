@@ -1,7 +1,15 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:wares/repositories/KitBomRepository.dart';
+import 'package:wares/repositories/products_repository.dart';
+import 'package:wares/screens/AddKitForm.dart';
+import 'package:wares/screens/DeleteKitForm.dart';
+import 'package:wares/screens/UpdateKitForm.dart';
+import 'package:wares/screens/lookup_list_screen.dart';
 import 'main.dart';
-
+import 'models/KitBomItem.dart';
+import 'models/products.dart';
+enum DisplayState { search, add, update, delete }
 class AllTsKs extends StatefulWidget{
    AllTsKs({Key? key}) : super(key: key);
   void navigateBack(BuildContext ctx){
@@ -11,76 +19,186 @@ class AllTsKs extends StatefulWidget{
   }
   final formKey = GlobalKey<FormState>();
 
+
   @override
   State<AllTsKs> createState() => _AllTsKsState();
 }
 
 class _AllTsKsState extends State<AllTsKs> {
-  String selectedValue_Rev = 'A';
-  List<DropdownMenuItem<String>> get dropdownItems_Rev{
-    return[
-      DropdownMenuItem(child: Text("A"), value: 'A'),
-      DropdownMenuItem(child: Text("B"), value: 'B'),
-      DropdownMenuItem(child: Text("C"), value: 'C'),
-      DropdownMenuItem(child: Text("D"), value: 'D'),
-      DropdownMenuItem(child: Text("E"), value: 'E'),
 
-    ];
+
+  late TextEditingController productNoController;
+  late TextEditingController revController;
+  late TextEditingController statusController;
+  late TextEditingController typeController;
+  late TextEditingController descriptionController;
+  late TextEditingController configurationController;
+  late TextEditingController llcController;
+  late TextEditingController level1Controller;
+  late TextEditingController ecrController;
+  late TextEditingController listpriceController;
+  late TextEditingController commentsController ;
+  late TextEditingController labelDescController;
+  late TextEditingController productSpecController;
+  late TextEditingController labelConfigController;
+  late TextEditingController dateReqController;
+  late TextEditingController dateDueController;
+  late TextEditingController level2Controller;
+  late TextEditingController level3Controller;
+  late TextEditingController level4Controller;
+  late TextEditingController level5Controller;
+  late TextEditingController level6Controller;
+  late TextEditingController level7Controller;
+  late TextEditingController sequenceNumController;
+  late TextEditingController locationWaresController;
+  late TextEditingController locationAccpacController;
+  late TextEditingController locationMisysController;
+  late TextEditingController instGuideController;
+  List<KitBomItem> kitBomItems = [];
+  final KitBomRepository kitBomRepository = KitBomRepository();
+
+  @override
+  void initState() {
+    super.initState();
+    productNoController = TextEditingController();
+    revController = TextEditingController();
+    descriptionController = TextEditingController();
+    configurationController = TextEditingController();
+    llcController = TextEditingController();
+    level1Controller = TextEditingController();
+    typeController = TextEditingController();
+    ecrController = TextEditingController();
+    listpriceController =TextEditingController();
+    commentsController = TextEditingController();
+    statusController = TextEditingController();
+    labelDescController = TextEditingController();
+    productSpecController = TextEditingController();
+    labelConfigController = TextEditingController();
+    dateReqController = TextEditingController();
+    dateDueController = TextEditingController();
+    level2Controller = TextEditingController();
+    level3Controller = TextEditingController();
+    level4Controller = TextEditingController();
+    level5Controller = TextEditingController();
+    sequenceNumController = TextEditingController();
+    locationWaresController = TextEditingController();
+    locationAccpacController = TextEditingController();
+    locationMisysController = TextEditingController();
+    level6Controller = TextEditingController();
+    level7Controller = TextEditingController();
+    instGuideController = TextEditingController();
   }
-  String selectedValue_stat = 'Active';
-  List<DropdownMenuItem<String>> get dropdownItems_stat{
-    return[
-      DropdownMenuItem(child: Text("Active"), value: 'Active'),
-      DropdownMenuItem(child: Text("Inactive"), value: 'Inactive'),
-
-    ];
+  fetchAndDisplayKitBomItems(String kitNo) async {
+    try {
+      List<KitBomItem> items = await kitBomRepository.fetchKitBomItems(kitNo);
+      setState(() {
+        kitBomItems = items;
+      });
+    } catch (e) {
+      // Handle errors
+      print(e); // Consider showing an error message to the user
+    }
   }
-  String selectedValue_type = 'Active';
-  List<DropdownMenuItem<String>> get dropdownItems_type{
-    return[
-      DropdownMenuItem(child: Text("Active"), value: 'Active'),
-      DropdownMenuItem(child: Text("Inactive"), value: 'Inactive'),
-
-    ];
+  void handleSubmit() async {
+    if (widget.formKey.currentState!.validate()) {
+      // Form is valid, proceed to fetch data
+      String kitNo = productNoController.text;
+      await fetchAndDisplayKitBomItems(kitNo);
+      await fetchAndDisplayProductDetails(kitNo);
+    }
   }
-  String selectedValue_comp = 'EVSE';
-  List<DropdownMenuItem<String>> get dropdownItems_comp{
-    return[
-      DropdownMenuItem(child: Text("CMI"), value: 'CMI'),
-      DropdownMenuItem(child: Text("EVSE"), value: 'EVSE'),
-
-    ];
-  }
-  final TextEditingController _dateController = TextEditingController();
-
-  Future<void> _selectDate(BuildContext context) async {
+  Future<void> _selectDateTime(BuildContext context, TextEditingController controller) async {
     DateTime? selectedDate = await showDatePicker(
       context: context,
       initialDate: DateTime.now(),
       firstDate: DateTime(2000),
       lastDate: DateTime(2101),
     );
-    if (selectedDate != null && selectedDate != DateTime.now()) {
-      _dateController.text = "${selectedDate.toLocal()}".split(' ')[0];
+
+    if (selectedDate != null) {
+      TimeOfDay? selectedTime = await showTimePicker(
+        context: context,
+        initialTime: TimeOfDay.now(),
+      );
+
+      if (selectedTime != null) {
+        DateTime selectedDateTime = DateTime(
+          selectedDate.year,
+          selectedDate.month,
+          selectedDate.day,
+          selectedTime.hour,
+          selectedTime.minute,
+        );
+
+        String formattedDateTime = "${selectedDateTime.toLocal()}".split('.')[0];
+        controller.text = formattedDateTime;
+      }
     }
   }
-  final TextEditingController _dateControllerDue = TextEditingController();
+  final ProductRepository productRepository = ProductRepository();
 
-  Future<void> _selectDateDue(BuildContext context) async {
-    DateTime? selectedDate = await showDatePicker(
-      context: context,
-      initialDate: DateTime.now(),
-      firstDate: DateTime(2000),
-      lastDate: DateTime(2101),
-    );
-    if (selectedDate != null && selectedDate != DateTime.now()) {
-      _dateController.text = "${selectedDate.toLocal()}".split(' ')[0];
+  fetchAndDisplayProductDetails(String productNo) async {
+    try {
+      Product? product = await productRepository.fetchProductDetails(productNo);
+      if (product != null) {
+        // Update your controllers here with the data from 'product'
+        revController.text = product.rev ?? '';
+        descriptionController.text = product.description ?? '';
+        configurationController.text = product.configuration ?? '';
+        llcController.text = product.llc.toString() ?? '';
+        level1Controller.text = product.leveL1 ?? '';
+        level2Controller.text = product.leveL2 ?? '';
+        level3Controller.text = product.leveL3 ?? '';
+        level4Controller.text = product.leveL4 ?? '';
+        level5Controller.text = product.leveL5 ?? '';
+        level6Controller.text = product.leveL6 ?? '';
+        level7Controller.text = product.leveL7 ?? '';
+        typeController.text = product.type ?? '';
+        ecrController.text = product.ecr ?? '';
+        listpriceController.text = product.listprice.toString() ?? '';
+        commentsController.text = product.comments ?? '';
+        statusController.text = product.active ?? '';
+        productSpecController.text = product.producT_SPEC ?? '';
+        labelDescController.text = product.labeL_DESC ?? '';
+        labelConfigController.text = product.labeL_CONFIG ?? '';
+        dateReqController.text = product.datE_REQ ?? '';
+        dateDueController.text = product.datE_DUE ?? '';
+        sequenceNumController.text = product.sequencE_NUM.toString() ?? '';
+        locationWaresController.text = product.locatioN_WARES ?? '';
+        locationAccpacController.text = product.locatioN_ACCPAC ?? '';
+        locationMisysController.text = product.locatioN_MISYS ?? '';
+        instGuideController.text = product.insT_GUIDE ?? '';
+
+
+        // ... [Update other controllers similarly]
+      } else {
+        // Handle the case where product details are not found
+        print("Product details not found");
+      }
+    } catch (e) {
+      // Handle other errors
+      print(e);
     }
   }
+  void navigateLookUp(BuildContext ctx){
+    Navigator.of(ctx).push(MaterialPageRoute(builder: (_){
+      return LookupListScreen();
+    }));
+  }
+  DisplayState _currentDisplay = DisplayState.search;
+  void _changeDisplay(DisplayState state) {
+    setState(() {
+      _currentDisplay = state;
+    });
+  }
 
+
+  List<Map<String, dynamic>> kitData = [];
   @override
   Widget build(BuildContext context){
     double screenWidth = MediaQuery.of(context).size.width;
+    double formWidth = screenWidth * 0.6;
+
     return Scaffold(
       appBar: AppBar(
         title: Image.asset('images/logo_cmi.png'),
@@ -91,404 +209,755 @@ class _AllTsKsState extends State<AllTsKs> {
           },
         ),
       ),
-        body:
-            Center(
-              child: SingleChildScrollView(
+
+        body: Column(
+          children: [
+            _buildActionButtons(context),
+            Expanded(child: _buildContent(context))
+          ],
+        )
+
+
+
+    );
+
+  }
+
+  Widget _buildContent(BuildContext context) {
+    switch (_currentDisplay) {
+      case DisplayState.search:
+        return _buildSearchForm(context); // Method that returns your search form and datatable
+      case DisplayState.add:
+        return AddKitForm(); // Widget for adding kits
+      case DisplayState.update:
+        return UpdateKitForm(); // Widget for updating
+      case DisplayState.delete:
+        return DeleteKitForm(); // Widget for deleting
+      default:
+        return Container(); // Fallback for an undefined state
+    }
+  }
+  Widget _buildActionButtons(BuildContext context)
+
+  {
+    double screenWidth = MediaQuery.of(context).size.width;
+    return  Row(
+      mainAxisAlignment: MainAxisAlignment.start,
+
+      children: [
+        SizedBox(height: screenWidth *0.06),
+        SizedBox(width: screenWidth *0.06),
+        ElevatedButton(onPressed: () => _changeDisplay(DisplayState.search), child: Text('Search')),
+        SizedBox(width: screenWidth *0.06),
+        ElevatedButton(onPressed: () => _changeDisplay(DisplayState.add),child: Text('Add')),
+        SizedBox(width: screenWidth *0.06),
+        ElevatedButton(onPressed: () => _changeDisplay(DisplayState.update), child: Text('Update')),
+        SizedBox(width: screenWidth *0.06),
+        ElevatedButton(onPressed: () => _changeDisplay(DisplayState.delete), child: Text('Delete')),
+        SizedBox(width: screenWidth *0.06),
+        ElevatedButton(onPressed: () {navigateLookUp(context);}, child: Text('LookUp')),
+      ],
+    );
+  }
+  Widget _buildSearchForm(BuildContext context){
+    double screenWidth = MediaQuery.of(context).size.width;
+    double formWidth = screenWidth * 0.6;
+
+    return  Column(
+      children: [
+        // Row for Add, Update, Delete buttons
+
+        Expanded(
+          child: Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              SingleChildScrollView(
                 child: Container(
                   padding: const EdgeInsets.only(top:10,left: 40, right: 40, bottom: 50),
                   child: Container(
-                      width: screenWidth * 0.8,
-                     /* height: screenWidth* 0.25,*/
-                      decoration: BoxDecoration(
+                    width: formWidth,
+                    /* height: screenWidth* 0.25,*/
+                    decoration: BoxDecoration(
                       border: Border.all(
-                      color: Colors.black,
-                      width: 2,
+                        color: Colors.black,
+                        width: 2,
                       ),
                       boxShadow: [
-                      BoxShadow(
-                      color: Colors.grey.withOpacity(0.5),
-                      spreadRadius: 5,
-                      blurRadius: 7,
-                      offset: Offset(0,3),
-                      )
+                        BoxShadow(
+                          color: Colors.grey.withOpacity(0.5),
+                          spreadRadius: 5,
+                          blurRadius: 7,
+                          offset: Offset(0,3),
+                        )
                       ],borderRadius: BorderRadius.circular(12),
-                      ),
-                    child: Form(
+                    ),
+
+                    child:  Form(
                       key: widget.formKey,
                       child:
                       Column(
-                          mainAxisSize: MainAxisSize.min,
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          crossAxisAlignment: CrossAxisAlignment.center,
-                          children: [
-                            Row(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: [
-                                Center(
-                                  child: Text(
-                                    "T's K's AND A's",
-                                    style: TextStyle(fontSize: 30),
+                        mainAxisSize: MainAxisSize.min,
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Center(
+                                child: Text(
+                                  "T's K's AND A's",
+                                  style: TextStyle(fontSize: 30),
+                                ),
+                              ),
+                              SizedBox(height: screenWidth *0.06),
+                            ],
+
+                          ),
+
+                          Column(
+                            children: [
+                              Row(
+                                mainAxisAlignment: MainAxisAlignment.start,
+                                children: [
+
+                                  SizedBox(width: screenWidth *0.03),
+                                  Flexible(child: SizedBox(
+                                    width: screenWidth*0.15,
+
+                                    child:
+                                    TextFormField(
+                                      controller: productNoController,
+
+                                      decoration: InputDecoration(
+                                        labelText: 'PRODUCT NUMBER',
+                                        labelStyle: TextStyle(
+                                          fontWeight: FontWeight.bold,  // This makes the labelText bold
+                                        ),
+
+                                      ),
+                                      /* onFieldSubmitted: (value) {
+                                              // Call the method when the user submits the product number
+                                              fetchAndDisplayProductDetails(value);
+                                            },*/
+                                    ),
+                                  ),),
+                                  SizedBox(width: screenWidth *0.03),
+                                  Flexible(child: SizedBox(
+                                    width: 200,
+
+                                    child:
+                                    TextFormField(
+                                      controller: revController,
+                                      decoration: InputDecoration(
+                                        labelText: 'REV',
+                                        labelStyle: TextStyle(
+                                          fontWeight: FontWeight.bold,  // This makes the labelText bold
+                                        ),
+
+                                      ),
+                                      readOnly: true,
+                                    ),
+                                  ),),
+
+                                  SizedBox(width: screenWidth *0.03),
+                                  Flexible(child: SizedBox(
+                                    width: 200,
+
+                                    child:
+                                    TextFormField(
+                                      controller: statusController,
+                                      decoration: InputDecoration(
+                                        labelText: 'STATUS',
+                                        labelStyle: TextStyle(
+                                          fontWeight: FontWeight.bold,  // This makes the labelText bold
+                                        ),
+
+                                      ),
+                                      readOnly: true,
+                                    ),
+                                  ),
+                                  ),
+                                  SizedBox(width: screenWidth *0.03),
+                                  Flexible(child: SizedBox(
+                                    width: 200,
+
+                                    child:
+                                    TextFormField(
+                                      controller: typeController,
+                                      decoration: InputDecoration(
+                                        labelText: 'TYPE',
+                                        labelStyle: TextStyle(
+                                          fontWeight: FontWeight.bold,  // This makes the labelText bold
+                                        ),
+
+                                      ),
+                                      readOnly: true,
+                                    ),
+                                  ),
+                                  ),
+
+                                  SizedBox(width: screenWidth *0.03),
+                                ],
+                              ),
+
+                              SizedBox(height: screenWidth *0.01),
+                              Row(
+                                mainAxisAlignment: MainAxisAlignment.start,
+                                children: [
+                                  SizedBox(width: screenWidth *0.03),
+                                  Flexible(child: SizedBox(
+                                    width: 200,
+                                    child:
+                                    TextFormField(
+                                      controller: descriptionController,
+                                      maxLines: null,
+                                      keyboardType: TextInputType.multiline,
+                                      decoration: InputDecoration(
+                                        labelText: 'DESCRIPTION',
+                                        labelStyle: TextStyle(
+                                          fontWeight: FontWeight.bold,  // This makes the labelText bold
+                                        ),
+                                      ),readOnly: true,
+                                    ),
+                                  ),),
+
+                                  SizedBox(width: screenWidth *0.03, height: 10,),
+                                  Flexible(child: SizedBox(
+                                    width: screenWidth*0.3,
+                                    child:
+                                    TextFormField(
+                                      controller: labelDescController,
+                                      maxLines: null,
+                                      keyboardType: TextInputType.multiline,
+                                      decoration: InputDecoration(
+                                        labelText: 'LABEL DESCRIPTION',
+                                        labelStyle: TextStyle(
+                                          fontWeight: FontWeight.bold,  // This makes the labelText bold
+                                        ),
+                                      ),readOnly: true,
+                                    ),
+                                  ),),
+                                  SizedBox(width: screenWidth *0.03),
+                                  Flexible(child: SizedBox(
+                                    width: screenWidth*0.3,
+                                    child:
+                                    TextFormField(
+                                      controller: configurationController,
+                                      maxLines: null,
+                                      keyboardType: TextInputType.multiline,
+                                      decoration: InputDecoration(
+                                        labelText: 'CONFIGURATION',
+                                        labelStyle: TextStyle(
+                                          fontWeight: FontWeight.bold,  // This makes the labelText bold
+                                        ),
+                                      ),readOnly: true,
+                                    ),
+                                  ),),
+
+                                  SizedBox(width: screenWidth *0.03),
+                                  Flexible(child: SizedBox(
+                                    width: screenWidth*0.3,
+                                    child:
+                                    TextFormField(
+                                      controller: labelConfigController,
+                                      maxLines: null,
+                                      keyboardType: TextInputType.multiline,
+                                      decoration: InputDecoration(
+                                        labelText: 'LABEL CONFIGURATION',
+                                        labelStyle: TextStyle(
+                                          fontWeight: FontWeight.bold,  // This makes the labelText bold
+                                        ),
+                                      ),readOnly: true,
+                                    ),
+                                  ),),
+
+
+                                  SizedBox(width: screenWidth *0.03),
+                                ],
+                              ),
+                              SizedBox(height: screenWidth *0.01),
+                              Row(
+                                mainAxisAlignment: MainAxisAlignment.start,
+                                children: [
+                                  SizedBox(width: screenWidth *0.03),
+                                  Flexible(child: SizedBox(
+                                    width: screenWidth*0.3,
+                                    child:
+                                    TextFormField(
+                                      controller: listpriceController,
+                                      maxLines: null,
+                                      keyboardType: TextInputType.multiline,
+                                      decoration: InputDecoration(
+                                        labelText: 'LIST PRICE',
+                                        labelStyle: TextStyle(
+                                          fontWeight: FontWeight.bold,  // This makes the labelText bold
+                                        ),
+                                      ),readOnly: true,
+                                    ),
+                                  ),),
+
+                                  SizedBox(width: screenWidth *0.03),
+                                  Flexible(child: SizedBox(
+                                    width: screenWidth*0.3,
+                                    child:
+                                    GestureDetector(
+                                      /*onTap: () => _selectDateTime(context, dateReqController),*/
+                                      child: AbsorbPointer(
+                                        child: TextFormField(
+                                          controller: dateReqController,
+                                          decoration: InputDecoration(
+                                              labelText: 'DATE REQUIRED',
+                                              labelStyle: TextStyle(
+                                                fontWeight: FontWeight.bold,
+                                              )
+                                          ),readOnly: true,
+                                        ),
+                                      ),
+                                    ),
+                                  ),),
+                                  SizedBox(width: screenWidth *0.03, height: 10,),
+                                  Flexible(child: SizedBox(
+                                    width: screenWidth*0.3,
+                                    child:
+                                    GestureDetector(
+                                      /*onTap: () => _selectDateTime(context, dateDueController),*/
+                                      child: AbsorbPointer(
+                                        child: TextFormField(
+                                          maxLines: null,
+                                          keyboardType: TextInputType.multiline,
+                                          controller: dateDueController,
+                                          decoration: InputDecoration(
+                                              labelText: 'DATE DUE',
+                                              labelStyle: TextStyle(
+                                                fontWeight: FontWeight.bold,
+                                              )
+                                          ),readOnly: true,
+                                        ),
+                                      ),
+                                    ),
+                                  ),),
+                                  SizedBox(width: screenWidth *0.03),
+                                  Flexible(child: SizedBox(
+                                    width: screenWidth*0.3,
+
+                                    child:
+                                    TextFormField(
+                                      controller: llcController,
+                                      maxLines: null,
+                                      keyboardType: TextInputType.multiline,
+                                      decoration: InputDecoration(
+                                        labelText: 'LLC',
+                                        labelStyle: TextStyle(
+                                          fontWeight: FontWeight.bold,  // This makes the labelText bold
+                                        ),
+
+                                      ),readOnly: true,
+                                    ),
+                                  ),
+
+
+                                  ),
+
+
+                                  SizedBox(width: screenWidth *0.03),
+                                ],
+                              ),
+
+                              SizedBox(height: screenWidth *0.01),
+                              Row(
+                                mainAxisAlignment: MainAxisAlignment.start,
+                                children: [
+                                  SizedBox(width: screenWidth *0.03),
+                                  Flexible(child: SizedBox(
+                                    width: screenWidth*0.3,
+
+                                    child:
+                                    TextFormField(
+                                      maxLines: null,
+                                      keyboardType: TextInputType.multiline,
+                                      controller: productSpecController,
+                                      decoration: InputDecoration(
+                                        labelText: 'PRODUCT SPECIFICATION',
+                                        labelStyle: TextStyle(
+                                          fontWeight: FontWeight.bold,  // This makes the labelText bold
+                                        ),
+
+                                      ),readOnly: true,
+                                    ),
+                                  ),),
+
+                                  SizedBox(width: screenWidth *0.03),
+                                  Flexible(child: SizedBox(
+                                    width: screenWidth*0.3,
+                                    child:
+                                    TextFormField(
+                                      controller: level1Controller,
+                                      maxLines: null,
+                                      keyboardType: TextInputType.multiline,
+                                      decoration: InputDecoration(
+                                        labelText: 'LEVEL 1',
+                                        labelStyle: TextStyle(
+                                          fontWeight: FontWeight.bold,  // This makes the labelText bold
+                                        ),
+
+                                      ),readOnly: true,
+                                    ),
+                                  ),),
+
+                                  SizedBox(width: screenWidth *0.03),
+                                  Flexible(child: SizedBox(
+                                    width: screenWidth*0.3,
+                                    child:
+                                    TextFormField(
+                                      controller: level2Controller,
+                                      maxLines: null,
+                                      keyboardType: TextInputType.multiline,
+                                      decoration: InputDecoration(
+                                        labelText: 'LEVEL 2',
+                                        labelStyle: TextStyle(
+                                          fontWeight: FontWeight.bold,  // This makes the labelText bold
+                                        ),
+
+                                      ),readOnly: true,
+                                    ),
+                                  ),),
+                                  SizedBox(width: screenWidth *0.03, height: 10,),
+                                  Flexible(child: SizedBox(
+                                    width: 200,
+
+                                    child:
+                                    TextFormField(
+                                      controller: level3Controller,
+                                      decoration: InputDecoration(
+                                        labelText: 'LEVEL 3',
+                                        labelStyle: TextStyle(
+                                          fontWeight: FontWeight.bold,  // This makes the labelText bold
+                                        ),
+
+                                      ),readOnly: true,
+                                    ),
+                                  ),
+
+
+                                  ),
+
+
+                                  //
+
+                                  SizedBox(width: screenWidth *0.03),
+                                ],
+                              ),
+                              SizedBox(height: screenWidth *0.01),
+                              Row(
+                                mainAxisAlignment: MainAxisAlignment.start,
+                                children: [
+
+                                  SizedBox(width: screenWidth *0.03),
+                                  Flexible(child: SizedBox(
+                                    width: 200,
+
+                                    child:
+                                    TextFormField(
+                                      controller: level4Controller,
+                                      decoration: InputDecoration(
+                                        labelText: 'LEVEL 4',
+                                        labelStyle: TextStyle(
+                                          fontWeight: FontWeight.bold,  // This makes the labelText bold
+                                        ),
+
+                                      ),readOnly: true,
+                                    ),
+                                  ),
+
+
+                                  ),
+                                  SizedBox(width: screenWidth *0.03),
+                                  Flexible(child: SizedBox(
+                                    width: 200,
+
+                                    child:
+                                    TextFormField(
+                                      controller: level5Controller,
+                                      decoration: InputDecoration(
+                                        labelText: 'LEVEL 5',
+                                        labelStyle: TextStyle(
+                                          fontWeight: FontWeight.bold,  // This makes the labelText bold
+                                        ),
+
+                                      ),readOnly: true,
+                                    ),
+                                  ),
+
+
+                                  ),
+
+                                  SizedBox(width: screenWidth *0.03),
+                                  Flexible(child: SizedBox(
+                                    width: 200,
+
+                                    child:
+                                    TextFormField(
+                                      controller: level6Controller,
+                                      decoration: InputDecoration(
+                                        labelText: 'LEVEL 6',
+                                        labelStyle: TextStyle(
+                                          fontWeight: FontWeight.bold,  // This makes the labelText bold
+                                        ),
+
+                                      ),readOnly: true,
+                                    ),
+                                  ),
+
+
+                                  ),
+
+                                  SizedBox(width: screenWidth *0.03),
+                                  Flexible(child: SizedBox(
+                                    width: 200,
+
+                                    child:
+                                    TextFormField(
+                                      controller: level7Controller,
+                                      decoration: InputDecoration(
+                                        labelText: 'LEVEL 7',
+                                        labelStyle: TextStyle(
+                                          fontWeight: FontWeight.bold,  // This makes the labelText bold
+                                        ),
+
+                                      ),readOnly: true,
+                                    ),
+                                  ),
+                                  ),
+                                  SizedBox(width: screenWidth *0.03),
+                                ],
+                              ),
+                              SizedBox(height: screenWidth *0.01),
+                              Row(
+                                mainAxisAlignment: MainAxisAlignment.start,
+                                children: [
+                                  SizedBox(width: screenWidth *0.03, height: 10,),
+                                  Flexible(child: SizedBox(
+                                    width: 200,
+
+                                    child:
+                                    TextFormField(
+                                      controller: sequenceNumController,
+                                      decoration: InputDecoration(
+                                        labelText: 'SEQUENCE NO',
+                                        labelStyle: TextStyle(
+                                          fontWeight: FontWeight.bold,  // This makes the labelText bold
+                                        ),
+
+                                      ),readOnly: true,
+                                    ),
+                                  ),
+
+
+                                  ),
+                                  SizedBox(width: screenWidth *0.03),
+                                  Flexible(child: SizedBox(
+                                    width: 200,
+
+                                    child:
+                                    TextFormField(
+                                      controller: locationWaresController,
+                                      decoration: InputDecoration(
+                                        labelText: 'LOCATION WARES',
+                                        labelStyle: TextStyle(
+                                          fontWeight: FontWeight.bold,  // This makes the labelText bold
+                                        ),
+
+                                      ),readOnly: true,
+                                    ),
+                                  ),
+
+
+                                  ),
+
+                                  SizedBox(width: screenWidth *0.03),
+                                  Flexible(child: SizedBox(
+                                    width: 200,
+
+                                    child:
+                                    TextFormField(
+                                      controller: locationAccpacController,
+                                      decoration: InputDecoration(
+                                        labelText: 'LOCATION ACCPAC',
+                                        labelStyle: TextStyle(
+                                          fontWeight: FontWeight.bold,  // This makes the labelText bold
+                                        ),
+
+                                      ),readOnly: true,
+                                    ),
+                                  ),
+
+
+                                  ),
+
+                                  SizedBox(width: screenWidth *0.03),
+                                  Flexible(child: SizedBox(
+                                    width: 200,
+
+                                    child:
+                                    TextFormField(
+                                      controller: locationMisysController,
+                                      decoration: InputDecoration(
+                                        labelText: 'LOCATION MISYS',
+                                        labelStyle: TextStyle(
+                                          fontWeight: FontWeight.bold,  // This makes the labelText bold
+                                        ),
+
+                                      ),readOnly: true,
+                                    ),
+                                  ),
+
+
+                                  ),
+
+                                  SizedBox(width: screenWidth *0.03),
+                                  Flexible(child: SizedBox(
+                                    width: 200,
+
+                                    child:
+                                    TextFormField(
+                                      controller: instGuideController,
+                                      decoration: InputDecoration(
+                                        labelText: 'INST GUIDE',
+                                        labelStyle: TextStyle(
+                                          fontWeight: FontWeight.bold,  // This makes the labelText bold
+                                        ),
+
+                                      ),readOnly: true,
+                                    ),
+                                  ),
+
+
+                                  ),
+                                  SizedBox(width: screenWidth *0.03),
+                                ],
+                              ),
+
+                            ],
+                          ),
+                          SizedBox(height: screenWidth *0.01),
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                            children: [
+                              Padding(padding: EdgeInsets.only(
+                                bottom: MediaQuery.of(context).size.height *0.02,
+                              ),
+                                child: Container(
+                                  width: screenWidth*0.2,
+                                  height: MediaQuery.of(context).size.height *0.05,
+                                  child: ElevatedButton(
+                                    onPressed: () {
+                                      // Validate the form data here.
+                                      handleSubmit();
+                                    },
+                                    child: Text('Submit'),
                                   ),
                                 ),
-                                SizedBox(height: screenWidth *0.06),
-                              ],
 
-                            ),
-
-                            Column(
-                              children: [
-                                Row(
-                                  mainAxisAlignment: MainAxisAlignment.start,
-                                  children: [
-
-                                    SizedBox(width: screenWidth *0.03),
-                                    Flexible(child: SizedBox(
-                                      width: screenWidth*0.15,
-
-                                      child:
-                                      TextFormField(
-                                        decoration: InputDecoration(
-                                          labelText: 'PRODUCT NUMBER',
-                                          labelStyle: TextStyle(
-                                            fontWeight: FontWeight.bold,  // This makes the labelText bold
-                                          ),
-                                        ),
-                                      ),
-                                    ),),
-                                    SizedBox(width: screenWidth *0.03),
-                                    Flexible(child: SizedBox(
-                                        width: screenWidth*0.15,
-
-                                        child: Column(
-                                          crossAxisAlignment: CrossAxisAlignment.start,
-                                          children: [
-                                            Text("REV"),
-                                            DropdownButton<String>(
-                                              value: selectedValue_Rev,
-                                              isExpanded: true,
-
-                                              items: dropdownItems_Rev,
-                                              onChanged: (value){
-                                                setState(() {
-                                                  selectedValue_Rev = value!;
-                                                });
-                                              },
-
-                                            )
-                                          ],
-
-                                        )
-
-                                    ),),
-
-                                    SizedBox(width: screenWidth *0.03),
-                                    Flexible(
-                                        child: SizedBox(
-                                            width: screenWidth*0.15,
-
-                                            child: Column(
-                                              crossAxisAlignment: CrossAxisAlignment.start,
-                                              children: [
-                                                Text("STATUS"),
-                                                DropdownButton<String>(
-                                                  value: selectedValue_stat,
-                                                  isExpanded: true,
-
-                                                  items: dropdownItems_stat,
-                                                  onChanged: (value){
-                                                    setState(() {
-                                                      selectedValue_stat = value!;
-                                                    });
-                                                  },
-
-                                                )
-                                              ],
-
-                                            )
-
-                                        )
+                              ),
+                              Container(
+                                width: screenWidth * 0.2,
+                                height: MediaQuery.of(context).size.height * 0.05,
+                                child: ElevatedButton(
+                                  onPressed: () {
+                                    // Clear all the text controllers
+                                    productNoController.clear();
+                                    revController.clear();
+                                    descriptionController.clear();
+                                    configurationController.clear();
+                                    llcController.clear();
+                                    level1Controller.clear();
+                                    typeController.clear();
+                                    ecrController.clear();
+                                    listpriceController.clear();
+                                    commentsController.clear();
+                                    statusController.clear();
+                                    labelDescController.clear();
+                                    productSpecController.clear();
+                                    labelConfigController.clear();
+                                    dateReqController.clear();
+                                    dateDueController.clear();
+                                    level2Controller.clear();
+                                    level3Controller.clear();
+                                    level4Controller.clear();
+                                    level5Controller.clear();
+                                    sequenceNumController.clear();
+                                    locationWaresController.clear();
+                                    locationAccpacController.clear();
+                                    locationMisysController.clear();
+                                    level6Controller.clear();
+                                    level7Controller.clear();
+                                    instGuideController.clear();
+                                    // Set _isProductNumberValid to false
+                                    /*setState(() {
+                                            _isProductNumberValid = false;
+                                          });*/
+                                  },
+                                  child: Text('Clear'),
+                                ),
+                              ),
+                            ],
+                          ),
 
 
-                                    ),
-
-                                    SizedBox(width: screenWidth *0.03),
-                                    Flexible(child: SizedBox(
-                                        width: screenWidth*0.15,
-
-                                        child: Column(
-                                          crossAxisAlignment: CrossAxisAlignment.start,
-                                          children: [
-                                            Text("TYPE"),
-                                            DropdownButton<String>(
-                                              value: selectedValue_type,
-                                              isExpanded: true,
-
-                                              items: dropdownItems_type,
-                                              onChanged: (value){
-                                                setState(() {
-                                                  selectedValue_type = value!;
-                                                });
-                                              },
-
-                                            )
-                                          ],
-
-                                        )
-
-                                    ),),
-
-                                    SizedBox(width: screenWidth *0.03),
-                                    Flexible(child: SizedBox(
-                                      width: screenWidth*0.15,
-                                      child:
-                                      TextFormField(
-                                        maxLines: null,
-                                        keyboardType: TextInputType.multiline,
-                                        decoration: InputDecoration(
-                                          labelText: 'DESCRIPTION',
-                                          labelStyle: TextStyle(
-                                            fontWeight: FontWeight.bold,  // This makes the labelText bold
-                                          ),
-                                        ),
-                                      ),
-                                    ),),
-                                    SizedBox(width: screenWidth *0.03),
-
+                          /*  DataTable(
+                                  columns: const [
+                                    DataColumn(label: Text('Product No')),
+                                    DataColumn(label: Text('Quantity')),
+                                    DataColumn(label: Text('List Price')),
                                   ],
-                                ),
-
-
-
-                                SizedBox(height: screenWidth *0.01),
-                                Row(
-                                  mainAxisAlignment: MainAxisAlignment.start,
-                                  children: [
-                                    SizedBox(width: screenWidth *0.03),
-                                    Flexible(child: SizedBox(
-                                      width: screenWidth*0.15,
-                                      child:
-                                      TextFormField(
-                                        maxLines: null,
-                                        keyboardType: TextInputType.multiline,
-                                        decoration: InputDecoration(
-                                          labelText: 'LABEL_DESC',
-                                          labelStyle: TextStyle(
-                                            fontWeight: FontWeight.bold,  // This makes the labelText bold
-                                          ),
-                                        ),
-                                      ),
-                                    ),),
-                                    SizedBox(width: screenWidth *0.03),
-                                    Flexible(child: SizedBox(
-                                      width: screenWidth*0.15,
-                                      child:
-                                      TextFormField(
-                                        maxLines: null,
-                                        keyboardType: TextInputType.multiline,
-                                        decoration: InputDecoration(
-                                          labelText: 'CONFIGURATION',
-                                          labelStyle: TextStyle(
-                                            fontWeight: FontWeight.bold,  // This makes the labelText bold
-                                          ),
-                                        ),
-                                      ),
-                                    ),),
-
-                                    SizedBox(width: screenWidth *0.03),
-                                    Flexible(child: SizedBox(
-                                      width: screenWidth*0.15,
-                                      child:
-                                      TextFormField(
-                                        maxLines: null,
-                                        keyboardType: TextInputType.multiline,
-                                        decoration: InputDecoration(
-                                          labelText: 'LABEL_CONFIG',
-                                          labelStyle: TextStyle(
-                                            fontWeight: FontWeight.bold,  // This makes the labelText bold
-                                          ),
-                                        ),
-                                      ),
-                                    ),),
-
-                                    SizedBox(width: screenWidth *0.03),
-                                    Flexible(child: SizedBox(
-                                      width: screenWidth*0.15,
-                                      child:
-                                      TextFormField(
-                                        maxLines: null,
-                                        keyboardType: TextInputType.multiline,
-                                        decoration: InputDecoration(
-                                          labelText: 'LIST_PRICE',
-                                          labelStyle: TextStyle(
-                                            fontWeight: FontWeight.bold,  // This makes the labelText bold
-                                          ),
-                                        ),
-                                      ),
-                                    ),),
-
-                                    SizedBox(width: screenWidth *0.03),
-                                    Flexible(child: SizedBox(
-                                      width: screenWidth*0.15,
-                                      child: GestureDetector(
-                                        onTap: () => _selectDate(context),
-                                        child: AbsorbPointer(
-                                          child: TextFormField(
-                                            controller: _dateController,
-                                            decoration: InputDecoration(
-                                                labelText: 'DATE_REQ',
-                                                labelStyle: TextStyle(
-                                                  fontWeight: FontWeight.bold,
-                                                )
-                                            ),
-                                          ),
-                                        ),
-                                      ),
-                                      /*TextFormField(
-                                  maxLines: null,
-                                  keyboardType: TextInputType.multiline,
-                                  decoration: InputDecoration(
-                                    labelText: 'DATE_REQ',
-                                    labelStyle: TextStyle(
-                                      fontWeight: FontWeight.bold,  // This makes the labelText bold
-                                    ),
-                                  ),
+                                  rows: kitBomItems.map((item) => DataRow(cells: [
+                                    DataCell(Text(item.productNo)),
+                                    DataCell(Text(item.quantity.toString())),
+                                    DataCell(Text(item.listPrice.toString())),
+                                  ])).toList(),
                                 ),*/
-                                    ),),
-                                    SizedBox(width: screenWidth *0.03),
-                                  ],
-                                ),
-                                SizedBox(height: screenWidth *0.01),
-                                Row(
-                                  mainAxisAlignment: MainAxisAlignment.start,
-                                  children: [
-                                    SizedBox(width: screenWidth *0.03, height: 10,),
-                                    Flexible(child: SizedBox(
-                                        width: screenWidth*0.15,
-
-                                        child: GestureDetector(
-                                          onTap: () => _selectDateDue(context),
-                                          child: AbsorbPointer(
-                                            child: TextFormField(
-                                              controller: _dateControllerDue,
-                                              decoration: InputDecoration(
-                                                  labelText: 'DATE_DUE',
-                                                  labelStyle: TextStyle(
-                                                    fontWeight: FontWeight.bold,
-                                                  )
-                                              ),
-                                            ),
-                                          ),
-                                        )
-                                    ),),
-                                    SizedBox(width: screenWidth *0.03),
-                                    Flexible(
-                                        child: SizedBox(
-                                            width: screenWidth*0.15,
-                                            child: Column(
-                                              crossAxisAlignment: CrossAxisAlignment.start,
-                                              children: [
-                                                Text("COMPANY"),
-                                                DropdownButton<String>(
-                                                  value: selectedValue_comp,
-                                                  isExpanded: true,
-
-                                                  items: dropdownItems_comp,
-                                                  onChanged: (value){
-                                                    setState(() {
-                                                      selectedValue_comp = value!;
-                                                    });
-                                                  },
-
-                                                )
-                                              ],
-
-                                            )
-                                        )
 
 
-                                    ),
-
-                                    SizedBox(width: screenWidth *0.03),
-                                    Flexible(child: SizedBox(
-                                      width: screenWidth*0.15,
-                                      child:
-                                      TextFormField(
-                                        maxLines: null,
-                                        keyboardType: TextInputType.multiline,
-                                        decoration: InputDecoration(
-                                          labelText: 'ECR',
-                                          contentPadding: EdgeInsets.all(5),
-                                          labelStyle: TextStyle(
-                                            fontWeight: FontWeight.bold,  // This makes the labelText bold
-                                          ),
-
-                                        ),
-                                      ),
-                                    ),),
-
-                                    SizedBox(width: screenWidth *0.03),
-                                    Flexible(child: SizedBox(
-                                      width: screenWidth*0.15,
-                                      child:
-                                      TextFormField(
-                                        maxLines: null,
-                                        keyboardType: TextInputType.multiline,
-                                        decoration: InputDecoration(
-                                          labelText: 'COMMENTS',
-                                          contentPadding: EdgeInsets.all(5),
-                                          labelStyle: TextStyle(
-                                            fontWeight: FontWeight.bold,  // This makes the labelText bold
-                                          ),
-
-                                        ),
-                                      ),
-                                    ),),
-                                  ],
-                                ),
-
-                              ],
-                            ),
-
-                            Column(
-                              children: [
-                                Padding(padding: EdgeInsets.only(
-                                  bottom: MediaQuery.of(context).size.height *0.02,
-                                ),
-                                  child: Container(
-                                    width: screenWidth*0.2,
-                                    height: MediaQuery.of(context).size.height *0.05,
-                                    child: ElevatedButton(
-                                      onPressed: () {
-                                        // Validate the form data here.
-                                        if (widget.formKey.currentState!.validate()) {
-                                          // Submit the form data here.
-                                        }
-                                      },
-                                      child: Text('Submit'),
-                                    ),
-                                  ),
-                                ),
-                              ],
-                            ),
+                        ],
 
 
-
-                          ],
-
-
-                        ),
+                      ),
 
 
 
                     ),
 
+
                   ),
+
 
                 ),
 
-              ),
-            )
 
+              ),
+              Expanded(
+                child: Container(
+                  child: DataTable(
+                    columns: const [
+                      DataColumn(label: Text('Product No')),
+                      DataColumn(label: Text('Quantity')),
+                      DataColumn(label: Text('List Price')),
+                    ],
+                    rows: kitBomItems.map((item) => DataRow(cells: [
+                      DataCell(Text(item.productNo)),
+                      DataCell(Text(item.quantity.toString())),
+                      DataCell(Text(item.listPrice.toString())),
+                    ])).toList(),
+                  ),
+                ),
+              ),
+            ],
+          ),
+
+
+        ),
+
+      ],
     );
   }
 }

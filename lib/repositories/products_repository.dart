@@ -11,6 +11,7 @@ abstract class IProductRepository {
   Future<bool> updateProduct(String productNo, ProductSubmission productSubmission);
   Future<bool> createProduct(ProductSubmission productSubmission);
   Future<Tuple2<bool, Product?>> checkProduct(String productNo);
+  Future<Product> fetchProductDetails(String productNo);
 }
 
 class ProductRepository implements IProductRepository{
@@ -83,6 +84,24 @@ print(url);
     } catch (e) {
       print('Error checking product: $e');
       return const Tuple2(false, null);
+    }
+  }
+
+  @override
+  Future<Product> fetchProductDetails(String productNo) async {
+    final url = Uri.parse('$_host/$productNo');
+    try {
+      final response = await http.get(url, headers: _headers);
+      if (response.statusCode == 200) {
+        final product = Product.fromJson(json.decode(response.body));
+        return product;
+      } else {
+        // Handle other HTTP status codes as needed
+        throw Exception('Failed to load product details');
+      }
+    } catch (e) {
+      // Handle any exceptions
+      throw Exception('Error fetching product details: $e');
     }
   }
 

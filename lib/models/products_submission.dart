@@ -192,6 +192,7 @@ class ProductSubmission {
   final String? level7;
   @JsonKey(name: 'insT_GUIDE')
   final String? instGuide;
+  final String? rowVersion;
 
   ProductSubmission({
     this.id,
@@ -222,6 +223,7 @@ class ProductSubmission {
     this.level6,
     this.level7,
     this.instGuide,
+    this.rowVersion,
   });
 
   factory ProductSubmission.fromProduct(Product product) {
@@ -254,6 +256,7 @@ class ProductSubmission {
       level6: _emptyToNull(product.leveL6),
       level7: _emptyToNull(product.leveL7),
       instGuide: _emptyToNull(product.insT_GUIDE),
+        rowVersion: _emptyToNull(product.rowVersion),
     );
   }
 

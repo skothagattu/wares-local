@@ -233,63 +233,6 @@ class _AllProductsState extends ConsumerState<AllProducts> {
       }
     }
   }
-/*
-  Future<void> _checkProductNumber(String productNo, WidgetRef ref) async {
-    if (productNo.isNotEmpty) {
-      // Use the provider to check the product
-      final result = await ref.read(checkProductProvider(productNo).future);
-
-      if (result.item1) {
-        // Product exists
-        showDialog(
-          context: context,
-          builder: (BuildContext context) {
-            return AlertDialog(
-              title: Text('Product Exists'),
-              content: Text('This product already exists. Do you want to edit it?'),
-              actions: <Widget>[
-                TextButton(
-                  onPressed: () {
-                    Navigator.of(context).pop();
-                    // Navigate to edit product page or perform edit action
-                    // You can use result.item2 to get the product details
-                  },
-                  child: Text('Yes'),
-                ),
-                TextButton(
-                  onPressed: () {
-                    Navigator.of(context).pop();
-                    productNoController.clear();
-                  },
-                  child: Text('No'),
-                ),
-              ],
-            );
-          },
-        );
-      } else {
-        // Product does not exist
-        showDialog(
-          context: context,
-          builder: (BuildContext context) {
-            return AlertDialog(
-              title: Text('Product Available'),
-              content: Text('The product number is available.'),
-              actions: <Widget>[
-                TextButton(
-                  onPressed: () {
-                    Navigator.of(context).pop();
-                  },
-                  child: Text('OK'),
-                ),
-              ],
-            );
-          },
-        );
-      }
-    }
-  }
-*/
 
 
 

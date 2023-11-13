@@ -19,7 +19,7 @@ class ProductTable extends StatefulWidget {
 class _ProductTableState extends State<ProductTable> {
   List<Product> displayedProducts = [];
   int currentPage = 1;
-  final pageSize = 50;
+  final pageSize = 15;
   final scrollController = ScrollController();
   String searchQuery = "";
 
