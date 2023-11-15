@@ -4,6 +4,8 @@ import 'package:http/http.dart' as http;
 
 abstract class IKitBomRepository {
   Future<List<KitBomItem>> fetchKitBomItems(String kitNo);
+  Future<bool> createKitBom(String kitNo, List<KitBomItem> components);
+  Future<bool> updateKitBom(String kitNo, List<KitBomItem> components);
 }
 
 class KitBomRepository implements IKitBomRepository {
@@ -26,6 +28,40 @@ class KitBomRepository implements IKitBomRepository {
     } else {
       // Handle errors
       throw Exception('Failed to load KitBom items');
+    }
+  }
+  @override
+  Future<bool> createKitBom(String kitNo, List<KitBomItem> components) async {
+    final url = Uri.parse('$_host/Create');
+    final body = json.encode({
+      "kitNo": kitNo,
+      "components": components.map((item) => item.toJson()).toList(),
+    });
+
+    final response = await http.post(url, headers: _headers, body: body);
+
+    if (response.statusCode == 200) {
+      return true;
+    } else {
+      // Handle errors
+      throw Exception('Failed to create KitBom');
+    }
+  }
+  @override
+  Future<bool> updateKitBom(String kitNo, List<KitBomItem> components) async {
+    final url = Uri.parse('$_host/Update'); // Adjust the endpoint as needed
+    final body = json.encode({
+      "kitNo": kitNo,
+      "components": components.map((item) => item.toJson()).toList(),
+    });
+
+    final response = await http.put(url, headers: _headers, body: body);
+
+    if (response.statusCode == 200) {
+      return true;
+    } else {
+      // Handle errors
+      throw Exception('Failed to update KitBom');
     }
   }
 }
