@@ -32,7 +32,6 @@ class _UpdateKitFormState extends State<UpdateKitForm> {
     });
   }
 
-
   void _handleSubmit() async {
     String kitNumber = kitNumberController.text;
     List<KitBomItem> components = componentControllers.map((controllers) {
@@ -42,7 +41,7 @@ class _UpdateKitFormState extends State<UpdateKitForm> {
         quantity: int.tryParse(controllers["quantity"]!.text) ?? 0,
         listPrice: double.tryParse(controllers["listPrice"]!.text) ?? 0.0,
       );
-    }).toList();// Logic to create a list of KitBomItem from your form data
+    }).toList();
 
     try {
       bool result = await _kitBomRepository.updateKitBom(kitNumber, components);
@@ -61,6 +60,7 @@ class _UpdateKitFormState extends State<UpdateKitForm> {
       );
     }
   }
+
 
   @override
   Widget build(BuildContext context) {
@@ -105,11 +105,16 @@ class _UpdateKitFormState extends State<UpdateKitForm> {
                 ),
                 SizedBox(height: 20),
                 ElevatedButton(
-                  onPressed: _handleSubmit,
-                  child: Text('Submit'),
+                  onPressed: () => fetchAndDisplayKitComponents(kitNumberController.text),
+                  child: Text('Get Details'),
                 ),
                 SizedBox(height: 20),
                 createComponentsDataTable(),
+                SizedBox(height: 20),
+                ElevatedButton(
+                  onPressed: _handleSubmit,
+                  child: Text('Submit'),
+                ),
 
               ],
 
@@ -124,9 +129,9 @@ class _UpdateKitFormState extends State<UpdateKitForm> {
     );
   }
 
-  void fetchAndDisplayKitComponents(String kitNumber) async {
+   void fetchAndDisplayKitComponents(String kitNumber) async {
     try {
-      List<KitBomItem> fetchedComponents = await _kitBomRepository.fetchKitBomItems(kitNumber);
+      List<KitBomItem> fetchedComponents = await _kitBomRepository.fetchKitBomItemsWithId(kitNumber);
       setState(() {
         componentControllers.clear();
         for (var component in fetchedComponents) {
@@ -145,6 +150,7 @@ class _UpdateKitFormState extends State<UpdateKitForm> {
     }
   }
 
+
   Widget createComponentsDataTable() {
     return DataTable(
       columns: const <DataColumn>[
@@ -152,21 +158,20 @@ class _UpdateKitFormState extends State<UpdateKitForm> {
         DataColumn(label: Text('Product Number')),
         DataColumn(label: Text('Quantity')),
         DataColumn(label: Text('List Price')),
-        // Add more columns if needed
       ],
       rows: componentControllers.map((controllers) {
         return DataRow(
           cells: <DataCell>[
-            DataCell(TextField(controller: controllers["id"])),
+            DataCell(TextField(controller: controllers["id"], enabled: false)), // ID field should be read-only
             DataCell(TextField(controller: controllers["productNumber"])),
             DataCell(TextField(controller: controllers["quantity"])),
             DataCell(TextField(controller: controllers["listPrice"])),
-            // Add more cells if needed
           ],
         );
       }).toList(),
     );
   }
+
 
 }
 

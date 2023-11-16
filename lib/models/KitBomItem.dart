@@ -8,6 +8,7 @@ class KitBomItem {
 
   factory KitBomItem.fromJson(Map<String, dynamic> json) {
     return KitBomItem(
+      id: json['id'] ?? 0,
       productNo: json['productNo'],
       quantity: json['quantity'],
       listPrice: json['listPrice'],
