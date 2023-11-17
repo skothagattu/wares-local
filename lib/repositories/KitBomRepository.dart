@@ -16,6 +16,8 @@ class KitBomRepository implements IKitBomRepository {
     "content-type": "application/json",
   };
 
+
+
   @override
   Future<List<KitBomItem>> fetchKitBomItems(String kitNo) async {
     final url = Uri.parse('$_host/$kitNo');
@@ -26,11 +28,14 @@ class KitBomRepository implements IKitBomRepository {
       final Map<String, dynamic> data = json.decode(response.body);
       final List<dynamic> itemsJson = data['items'];
       return itemsJson.map((jsonItem) => KitBomItem.fromJson(jsonItem)).toList();
+    } else if (response.statusCode == 404) {
+      throw NotFoundException('KitBom items not found for kit number $kitNo');
     } else {
-      // Handle errors
+      // Handle other errors
       throw Exception('Failed to load KitBom items');
     }
   }
+
   @override
   Future<List<KitBomItem>> fetchKitBomItemsWithId(String kitNo) async {
     final url = Uri.parse('$_host/GetWithId/$kitNo');
@@ -80,4 +85,13 @@ class KitBomRepository implements IKitBomRepository {
       throw Exception('Failed to update KitBom');
     }
   }
+
 }
+class NotFoundException implements Exception {
+  final String message;
+  NotFoundException(this.message);
+
+  @override
+  String toString() => message;
+}
+

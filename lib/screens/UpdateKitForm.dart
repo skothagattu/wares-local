@@ -22,13 +22,20 @@ class _UpdateKitFormState extends State<UpdateKitForm> {
   }
 
 
-  void _addNewComponentRow() {
+  List<Map<String, TextEditingController>> newComponentControllers = [];
+
+  void _addNewComponentRow({bool isNew = true}) {
     setState(() {
-      componentControllers.add({
+      var controllerSet = {
         "productNumber": TextEditingController(),
         "quantity": TextEditingController(),
         "listPrice": TextEditingController(),
-      });
+      };
+      if (isNew) {
+        newComponentControllers.add(controllerSet);
+      } else {
+        componentControllers.add(controllerSet);
+      }
     });
   }
 
@@ -42,13 +49,26 @@ class _UpdateKitFormState extends State<UpdateKitForm> {
         listPrice: double.tryParse(controllers["listPrice"]!.text) ?? 0.0,
       );
     }).toList();
+    List<KitBomItem> newComponents = newComponentControllers.map((controllers) {
+      return KitBomItem(
+        productNo: controllers["productNumber"]!.text,
+        quantity: int.tryParse(controllers["quantity"]!.text) ?? 0,
+        listPrice: double.tryParse(controllers["listPrice"]!.text) ?? 0.0,
+      );
+    }).toList();
 
     try {
-      bool result = await _kitBomRepository.updateKitBom(kitNumber, components);
-      if (result) {
+      bool updateResult = await _kitBomRepository.updateKitBom(kitNumber, components);
+      bool createResult = await _kitBomRepository.createKitBom(kitNumber, newComponents);
+
+      if (updateResult && createResult) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text("KitBom updated successfully")),
         );
+        fetchAndDisplayKitComponents(kitNumber); // Reload the data
+        setState(() {
+          newComponentControllers.clear(); // Clear the additional rows
+        });
       } else {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text("Failed to update KitBom")),
@@ -61,6 +81,14 @@ class _UpdateKitFormState extends State<UpdateKitForm> {
     }
   }
 
+
+  void _clearForm() {
+    setState(() {
+      kitNumberController.clear();
+      componentControllers.clear();
+      newComponentControllers.clear();
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -87,41 +115,57 @@ class _UpdateKitFormState extends State<UpdateKitForm> {
             ],
             borderRadius: BorderRadius.circular(12),
           ),
-          child: Padding(
+          child:  Padding(
             padding: const EdgeInsets.all(16.0),
             child: Column(
-              /*shrinkWrap: true,*/ // Important to prevent infinite height issue
               children: [
                 Center(child: Text("UPDATE KIT", style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold))),
                 SizedBox(height: 20),
-                TextField(
-                  controller: kitNumberController,
-                  decoration: InputDecoration(
-                    labelText: 'Kit Number',
+                Row(
+                  children: [
+                    Expanded(
+                      child: TextField(
+                        controller: kitNumberController,
+                        decoration: InputDecoration(labelText: 'Kit Number'),
+                        onSubmitted: (value) => fetchAndDisplayKitComponents(value),
+                      ),
+                    ),
+                    SizedBox(width: 10),
+                    ElevatedButton(
+                      onPressed: () => fetchAndDisplayKitComponents(kitNumberController.text),
+                      child: Text('Get Details'),
+                    ),
+                  ],
+                ),
+                SizedBox(height: 20),
+                if (componentControllers.isNotEmpty) ...[
+                  createComponentsDataTable(),
+                  SizedBox(height: 10),
+                  ElevatedButton(
+                    onPressed: () => _addNewComponentRow(isNew: true),
+                    child: Text('Add Component'),
                   ),
-                  onSubmitted: (value) {
-                    fetchAndDisplayKitComponents(value);
-                  },
-                ),
-                SizedBox(height: 20),
-                ElevatedButton(
-                  onPressed: () => fetchAndDisplayKitComponents(kitNumberController.text),
-                  child: Text('Get Details'),
-                ),
-                SizedBox(height: 20),
-                createComponentsDataTable(),
-                SizedBox(height: 20),
-                ElevatedButton(
-                  onPressed: _handleSubmit,
-                  child: Text('Submit'),
-                ),
-
+                  SizedBox(height: 20),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      ElevatedButton(
+                        onPressed: _handleSubmit,
+                        child: Text('Submit'),
+                      ),
+                      SizedBox(width: 10),
+                      ElevatedButton(
+                        onPressed: _clearForm,
+                        child: Text('Clear'),
+                        style: ElevatedButton.styleFrom(
+                          primary: Colors.grey, // Optional: Style for the clear button
+                        ),
+                      ),
+                    ],
+                  ),
+                ],
               ],
-
             ),
-
-
-
           ),
 
         ),
@@ -129,20 +173,31 @@ class _UpdateKitFormState extends State<UpdateKitForm> {
     );
   }
 
-   void fetchAndDisplayKitComponents(String kitNumber) async {
+  void fetchAndDisplayKitComponents(String kitNumber) async {
     try {
       List<KitBomItem> fetchedComponents = await _kitBomRepository.fetchKitBomItemsWithId(kitNumber);
-      setState(() {
-        componentControllers.clear();
-        for (var component in fetchedComponents) {
-          componentControllers.add({
-            "id": TextEditingController(text: component.id.toString()),
-            "productNumber": TextEditingController(text: component.productNo),
-            "quantity": TextEditingController(text: component.quantity.toString()),
-            "listPrice": TextEditingController(text: component.listPrice.toString()),
-          });
-        }
-      });
+      if (fetchedComponents.isEmpty) {
+        // No components found for the given kit number
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text("Kit number $kitNumber does not exist in KitBom")),
+        );
+        setState(() {
+          componentControllers.clear(); // Clear any existing data
+        });
+      } else {
+        // Components found, populate the form
+        setState(() {
+          componentControllers.clear();
+          for (var component in fetchedComponents) {
+            componentControllers.add({
+              "id": TextEditingController(text: component.id.toString()),
+              "productNumber": TextEditingController(text: component.productNo),
+              "quantity": TextEditingController(text: component.quantity.toString()),
+              "listPrice": TextEditingController(text: component.listPrice.toString()),
+            });
+          }
+        });
+      }
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text("Error occurred: $e")),
@@ -151,7 +206,45 @@ class _UpdateKitFormState extends State<UpdateKitForm> {
   }
 
 
+
   Widget createComponentsDataTable() {
+    var componentControllersRows = componentControllers.map((controllers) {
+      return DataRow(
+        cells: <DataCell>[
+          DataCell(TextField(controller: controllers["id"], enabled: false)), // ID field should be read-only
+          DataCell(TextField(controller: controllers["productNumber"])),
+          DataCell(TextField(controller: controllers["quantity"])),
+          DataCell(Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Expanded(child: TextField(controller: controllers["listPrice"])),
+              // No remove button for existing components
+            ],
+          )),
+        ],
+      );
+    }).toList();
+
+    var newComponentRows = newComponentControllers.asMap().map((index, controllers) {
+      return MapEntry(index, DataRow(
+        cells: <DataCell>[
+          DataCell(Container()),
+          DataCell(TextField(controller: controllers["productNumber"])),
+          DataCell(TextField(controller: controllers["quantity"])),
+          DataCell(Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Expanded(child: TextField(controller: controllers["listPrice"])),
+              IconButton(
+                icon: Icon(Icons.remove_circle_outline),
+                onPressed: () => _removeNewComponentRow(index),
+              ),
+            ],
+          )),
+        ],
+      ));
+    }).values.toList();
+
     return DataTable(
       columns: const <DataColumn>[
         DataColumn(label: Text('ID')),
@@ -159,18 +252,18 @@ class _UpdateKitFormState extends State<UpdateKitForm> {
         DataColumn(label: Text('Quantity')),
         DataColumn(label: Text('List Price')),
       ],
-      rows: componentControllers.map((controllers) {
-        return DataRow(
-          cells: <DataCell>[
-            DataCell(TextField(controller: controllers["id"], enabled: false)), // ID field should be read-only
-            DataCell(TextField(controller: controllers["productNumber"])),
-            DataCell(TextField(controller: controllers["quantity"])),
-            DataCell(TextField(controller: controllers["listPrice"])),
-          ],
-        );
-      }).toList(),
+      rows: componentControllersRows + newComponentRows,
     );
   }
+
+  void _removeNewComponentRow(int index) {
+    setState(() {
+      newComponentControllers.removeAt(index);
+    });
+  }
+
+
+
 
 
 }

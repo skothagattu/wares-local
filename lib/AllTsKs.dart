@@ -25,7 +25,7 @@ class AllTsKs extends StatefulWidget{
 }
 
 class _AllTsKsState extends State<AllTsKs> {
-
+  bool _isDataVisible = false;
 
   late TextEditingController productNoController;
   late TextEditingController revController;
@@ -91,14 +91,42 @@ class _AllTsKsState extends State<AllTsKs> {
   fetchAndDisplayKitBomItems(String kitNo) async {
     try {
       List<KitBomItem> items = await kitBomRepository.fetchKitBomItems(kitNo);
-      setState(() {
-        kitBomItems = items;
-      });
+      if (items.isNotEmpty) {
+        // Kit number exists in KitBom and has components
+        setState(() {
+          kitBomItems = items;
+          _isDataVisible = true;
+        });
+      } else {
+        // Kit number does not exist in KitBom
+        _clearForm(); // Clear all form fields
+        setState(() {
+          kitBomItems.clear();
+          _isDataVisible = false;
+        });
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text("Kit number is not available in KitBom")),
+        );
+      }
     } catch (e) {
-      // Handle errors
-      print(e); // Consider showing an error message to the user
+      if (e is NotFoundException) {
+        // Handle the case where the kit number does not exist in both ProductTable and KitBom
+        _clearForm(); // Clear all form fields
+        setState(() {
+          _isDataVisible = false;
+        });
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text("Kit number does not exist")),
+        );
+      } else {
+        // Handle other errors
+        print(e);
+      }
     }
   }
+
+
+
   void handleSubmit() async {
     if (widget.formKey.currentState!.validate()) {
       // Form is valid, proceed to fetch data
@@ -136,50 +164,111 @@ class _AllTsKsState extends State<AllTsKs> {
     }
   }
   final ProductRepository productRepository = ProductRepository();
+  bool _showProductDetails = false;
 
   fetchAndDisplayProductDetails(String productNo) async {
     try {
-      Product? product = await productRepository.fetchProductDetails(productNo);
-      if (product != null) {
-        // Update your controllers here with the data from 'product'
-        revController.text = product.rev ?? '';
-        descriptionController.text = product.description ?? '';
-        configurationController.text = product.configuration ?? '';
-        llcController.text = product.llc.toString() ?? '';
-        level1Controller.text = product.leveL1 ?? '';
-        level2Controller.text = product.leveL2 ?? '';
-        level3Controller.text = product.leveL3 ?? '';
-        level4Controller.text = product.leveL4 ?? '';
-        level5Controller.text = product.leveL5 ?? '';
-        level6Controller.text = product.leveL6 ?? '';
-        level7Controller.text = product.leveL7 ?? '';
-        typeController.text = product.type ?? '';
-        ecrController.text = product.ecr ?? '';
-        listpriceController.text = product.listprice.toString() ?? '';
-        commentsController.text = product.comments ?? '';
-        statusController.text = product.active ?? '';
-        productSpecController.text = product.producT_SPEC ?? '';
-        labelDescController.text = product.labeL_DESC ?? '';
-        labelConfigController.text = product.labeL_CONFIG ?? '';
-        dateReqController.text = product.datE_REQ ?? '';
-        dateDueController.text = product.datE_DUE ?? '';
-        sequenceNumController.text = product.sequencE_NUM.toString() ?? '';
-        locationWaresController.text = product.locatioN_WARES ?? '';
-        locationAccpacController.text = product.locatioN_ACCPAC ?? '';
-        locationMisysController.text = product.locatioN_MISYS ?? '';
-        instGuideController.text = product.insT_GUIDE ?? '';
+      List<KitBomItem> kitBomItems = await kitBomRepository.fetchKitBomItems(productNo);
+      bool existsInKitBom = kitBomItems.isNotEmpty;
 
-
-        // ... [Update other controllers similarly]
+      if (!existsInKitBom) {
+        _clearForm();
+        setState(() {
+          _isDataVisible = false;
+        });
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text("Product exists but Kit does not exist")),
+        );
       } else {
-        // Handle the case where product details are not found
-        print("Product details not found");
+        Product? product = await productRepository.fetchProductDetails(productNo);
+        if (product != null)  {
+          // Update your controllers here with the data from 'product'
+          revController.text = product.rev ?? '';
+          descriptionController.text = product.description ?? '';
+          configurationController.text = product.configuration ?? '';
+          llcController.text = product.llc.toString() ?? '';
+          level1Controller.text = product.leveL1 ?? '';
+          level2Controller.text = product.leveL2 ?? '';
+          level3Controller.text = product.leveL3 ?? '';
+          level4Controller.text = product.leveL4 ?? '';
+          level5Controller.text = product.leveL5 ?? '';
+          level6Controller.text = product.leveL6 ?? '';
+          level7Controller.text = product.leveL7 ?? '';
+          typeController.text = product.type ?? '';
+          ecrController.text = product.ecr ?? '';
+          listpriceController.text = product.listprice.toString() ?? '';
+          commentsController.text = product.comments ?? '';
+          statusController.text = product.active ?? '';
+          productSpecController.text = product.producT_SPEC ?? '';
+          labelDescController.text = product.labeL_DESC ?? '';
+          labelConfigController.text = product.labeL_CONFIG ?? '';
+          dateReqController.text = product.datE_REQ ?? '';
+          dateDueController.text = product.datE_DUE ?? '';
+          sequenceNumController.text = product.sequencE_NUM.toString() ?? '';
+          locationWaresController.text = product.locatioN_WARES ?? '';
+          locationAccpacController.text = product.locatioN_ACCPAC ?? '';
+          locationMisysController.text = product.locatioN_MISYS ?? '';
+          instGuideController.text = product.insT_GUIDE ?? '';
+
+          setState(() {
+            _showProductDetails = true; // Set to true to show the product details
+          });
+          // ... [Update other controllers similarly]
+        } else {
+          _clearForm();
+          setState(() {
+            _isDataVisible = false;
+          });
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text("Product details not found")),
+          );
+        }
       }
+
     } catch (e) {
       // Handle other errors
       print(e);
+      setState(() {
+        _showProductDetails = false; // Hide the details section in case of error
+      });
     }
   }
+  void _clearForm() {
+    // Clear all the text controllers
+ /*   productNoController.clear();*/
+    revController.clear();
+    statusController.clear();
+    typeController.clear();
+    descriptionController.clear();
+    configurationController.clear();
+    llcController.clear();
+    level1Controller.clear();
+    ecrController.clear();
+    listpriceController.clear();
+    commentsController.clear();
+    labelDescController.clear();
+    productSpecController.clear();
+    labelConfigController.clear();
+    dateReqController.clear();
+    dateDueController.clear();
+    level2Controller.clear();
+    level3Controller.clear();
+    level4Controller.clear();
+    level5Controller.clear();
+    level6Controller.clear();
+    level7Controller.clear();
+    sequenceNumController.clear();
+    locationWaresController.clear();
+    locationAccpacController.clear();
+    locationMisysController.clear();
+    instGuideController.clear();
+
+    setState(() {
+      _isDataVisible = false; // Hide the DataTable
+      kitBomItems.clear(); // Clear the kitBomItems list
+    });
+  }
+
   void navigateLookUp(BuildContext ctx){
     Navigator.of(ctx).push(MaterialPageRoute(builder: (_){
       return LookupListScreen();
@@ -249,9 +338,7 @@ class _AllTsKsState extends State<AllTsKs> {
         SizedBox(width: screenWidth *0.06),
         ElevatedButton(onPressed: () => _changeDisplay(DisplayState.search), child: Text('Search')),
         SizedBox(width: screenWidth *0.06),
-        ElevatedButton(onPressed: () => _changeDisplay(DisplayState.add),child: Text('Add')),
-        SizedBox(width: screenWidth *0.06),
-        ElevatedButton(onPressed: () => _changeDisplay(DisplayState.update), child: Text('Update')),
+        ElevatedButton(onPressed: () => _changeDisplay(DisplayState.update), child: Text('Modify')),
         SizedBox(width: screenWidth *0.06),
         ElevatedButton(onPressed: () => _changeDisplay(DisplayState.delete), child: Text('Delete')),
         SizedBox(width: screenWidth *0.06),
@@ -892,32 +979,15 @@ class _AllTsKsState extends State<AllTsKs> {
                                     level6Controller.clear();
                                     level7Controller.clear();
                                     instGuideController.clear();
-                                    // Set _isProductNumberValid to false
-                                    /*setState(() {
-                                            _isProductNumberValid = false;
-                                          });*/
+                                    setState(() {
+                                      _showProductDetails = false;
+                                    });
                                   },
                                   child: Text('Clear'),
                                 ),
                               ),
                             ],
                           ),
-
-
-                          /*  DataTable(
-                                  columns: const [
-                                    DataColumn(label: Text('Product No')),
-                                    DataColumn(label: Text('Quantity')),
-                                    DataColumn(label: Text('List Price')),
-                                  ],
-                                  rows: kitBomItems.map((item) => DataRow(cells: [
-                                    DataCell(Text(item.productNo)),
-                                    DataCell(Text(item.quantity.toString())),
-                                    DataCell(Text(item.listPrice.toString())),
-                                  ])).toList(),
-                                ),*/
-
-
                         ],
 
 
@@ -935,7 +1005,8 @@ class _AllTsKsState extends State<AllTsKs> {
 
 
               ),
-              Expanded(
+              _isDataVisible
+                  ? Expanded(
                 child: Container(
                   child: DataTable(
                     columns: const [
@@ -950,7 +1021,8 @@ class _AllTsKsState extends State<AllTsKs> {
                     ])).toList(),
                   ),
                 ),
-              ),
+              )
+                  : Container(),
             ],
           ),
 
