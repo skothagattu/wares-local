@@ -80,15 +80,17 @@ class _UpdateKitFormState extends State<UpdateKitForm> {
       );
     }
   }
-
+  bool shouldDisplayDataTable = false;
 
   void _clearForm() {
     setState(() {
       kitNumberController.clear();
       componentControllers.clear();
       newComponentControllers.clear();
+      shouldDisplayDataTable = false;
     });
   }
+
 
   @override
   Widget build(BuildContext context) {
@@ -138,7 +140,8 @@ class _UpdateKitFormState extends State<UpdateKitForm> {
                   ],
                 ),
                 SizedBox(height: 20),
-                if (componentControllers.isNotEmpty) ...[
+               /* if (componentControllers.isNotEmpty) ...[*/
+                if (shouldDisplayDataTable) ...[
                   createComponentsDataTable(),
                   SizedBox(height: 10),
                   ElevatedButton(
@@ -163,7 +166,8 @@ class _UpdateKitFormState extends State<UpdateKitForm> {
                       ),
                     ],
                   ),
-                ],
+                /*],*/
+      ]
               ],
             ),
           ),
@@ -176,34 +180,33 @@ class _UpdateKitFormState extends State<UpdateKitForm> {
   void fetchAndDisplayKitComponents(String kitNumber) async {
     try {
       List<KitBomItem> fetchedComponents = await _kitBomRepository.fetchKitBomItemsWithId(kitNumber);
-      if (fetchedComponents.isEmpty) {
-        // No components found for the given kit number
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text("Kit number $kitNumber does not exist in KitBom")),
-        );
-        setState(() {
-          componentControllers.clear(); // Clear any existing data
-        });
-      } else {
-        // Components found, populate the form
-        setState(() {
-          componentControllers.clear();
-          for (var component in fetchedComponents) {
-            componentControllers.add({
-              "id": TextEditingController(text: component.id.toString()),
-              "productNumber": TextEditingController(text: component.productNo),
-              "quantity": TextEditingController(text: component.quantity.toString()),
-              "listPrice": TextEditingController(text: component.listPrice.toString()),
-            });
-          }
-        });
-      }
+      setState(() {
+        componentControllers.clear();
+        shouldDisplayDataTable = true; // Set to true if API call is successful
+        for (var component in fetchedComponents) {
+          componentControllers.add({
+            "id": TextEditingController(text: component.id.toString()),
+            "productNumber": TextEditingController(text: component.productNo),
+            "quantity": TextEditingController(text: component.quantity.toString()),
+            "listPrice": TextEditingController(text: component.listPrice.toString()),
+          });
+        }
+        if (fetchedComponents.isEmpty) {
+          newComponentControllers.clear(); // Clear any existing new component rows
+          _addNewComponentRow(isNew: true); // Add a new row only if there are no components
+        }
+      });
     } catch (e) {
+      setState(() {
+        shouldDisplayDataTable = false; // Set to false in case of an error
+      });
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text("Error occurred: $e")),
       );
     }
   }
+
+
 
 
 

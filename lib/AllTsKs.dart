@@ -4,12 +4,13 @@ import 'package:wares/repositories/KitBomRepository.dart';
 import 'package:wares/repositories/products_repository.dart';
 import 'package:wares/screens/AddKitForm.dart';
 import 'package:wares/screens/DeleteKitForm.dart';
+import 'package:wares/screens/SearchByProductForm.dart';
 import 'package:wares/screens/UpdateKitForm.dart';
 import 'package:wares/screens/lookup_list_screen.dart';
 import 'main.dart';
 import 'models/KitBomItem.dart';
 import 'models/products.dart';
-enum DisplayState { search, add, update, delete }
+enum DisplayState { search,searchByProd, add, update, delete }
 class AllTsKs extends StatefulWidget{
    AllTsKs({Key? key}) : super(key: key);
   void navigateBack(BuildContext ctx){
@@ -315,7 +316,9 @@ class _AllTsKsState extends State<AllTsKs> {
   Widget _buildContent(BuildContext context) {
     switch (_currentDisplay) {
       case DisplayState.search:
-        return _buildSearchForm(context); // Method that returns your search form and datatable
+        return _buildSearchForm(context);
+      case DisplayState.searchByProd:
+        return SearchByProductForm(); // Method that returns your search form and datatable
       case DisplayState.add:
         return AddKitForm(); // Widget for adding kits
       case DisplayState.update:
@@ -336,7 +339,9 @@ class _AllTsKsState extends State<AllTsKs> {
       children: [
         SizedBox(height: screenWidth *0.06),
         SizedBox(width: screenWidth *0.06),
-        ElevatedButton(onPressed: () => _changeDisplay(DisplayState.search), child: Text('Search')),
+        ElevatedButton(onPressed: () => _changeDisplay(DisplayState.search), child: Text('Search By Kit')),
+        SizedBox(width: screenWidth *0.06),
+        ElevatedButton(onPressed: () => _changeDisplay(DisplayState.searchByProd), child: Text('Search By Product')),
         SizedBox(width: screenWidth *0.06),
         ElevatedButton(onPressed: () => _changeDisplay(DisplayState.update), child: Text('Modify')),
         SizedBox(width: screenWidth *0.06),

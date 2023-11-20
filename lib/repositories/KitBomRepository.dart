@@ -2,11 +2,16 @@ import 'dart:convert';
 import '../models/KitBomItem.dart';
 import 'package:http/http.dart' as http;
 
+import '../models/KitByProductitem.dart';
+
 abstract class IKitBomRepository {
   Future<List<KitBomItem>> fetchKitBomItems(String kitNo);
   Future<List<KitBomItem>> fetchKitBomItemsWithId(String kitNo);
+  Future<List<KitByProductItem>> fetchKitsByProductNo(String productNo);
   Future<bool> createKitBom(String kitNo, List<KitBomItem> components);
   Future<bool> updateKitBom(String kitNo, List<KitBomItem> components);
+  Future<bool> deleteKitComponent(String kitNo, String productNo);
+  Future<bool> deleteKit(String kitNo);
 }
 
 class KitBomRepository implements IKitBomRepository {
@@ -52,6 +57,20 @@ class KitBomRepository implements IKitBomRepository {
     }
   }
   @override
+  Future<List<KitByProductItem>> fetchKitsByProductNo(String productNo) async {
+    final url = Uri.parse('$_host/kitsByComponent/$productNo');
+    final response = await http.get(url, headers: _headers);
+    print('Status code: ${response.statusCode}');
+    print('Response body: ${response.body}');
+    if (response.statusCode == 200) {
+      final List<dynamic> itemsJson = json.decode(response.body);
+      return itemsJson.map((jsonItem) => KitByProductItem.fromJson(jsonItem)).toList();
+    } else {
+      // Handle errors
+      throw Exception('Failed to load kits for product number $productNo');
+    }
+  }
+  @override
   Future<bool> createKitBom(String kitNo, List<KitBomItem> components) async {
     final url = Uri.parse('$_host/Create');
     final body = json.encode({
@@ -83,6 +102,33 @@ class KitBomRepository implements IKitBomRepository {
     } else {
       // Handle errors
       throw Exception('Failed to update KitBom');
+    }
+  }
+  @override
+  Future<bool> deleteKitComponent(String kitNo, String productNo) async {
+    final url = Uri.parse('$_host/DeleteComponent/$kitNo/$productNo'); // Adjust the endpoint as needed
+    final response = await http.delete(url, headers: _headers);
+    print('Status code: ${response.statusCode}');
+    print('Response body: ${response.body}');
+    if (response.statusCode == 200 || response.statusCode == 204) {
+      return true;
+    } else {
+      // Handle errors
+      throw Exception('Failed to delete KitBom component');
+    }
+  }
+
+  @override
+  Future<bool> deleteKit(String kitNo) async {
+    final url = Uri.parse('$_host/DeleteKit/$kitNo'); // Adjust the endpoint as needed
+    final response = await http.delete(url, headers: _headers);
+    print('Status code: ${response.statusCode}');
+    print('Response body: ${response.body}');
+    if (response.statusCode == 200 || response.statusCode == 204) {
+      return true;
+    } else {
+      // Handle errors
+      throw Exception('Failed to delete kit');
     }
   }
 
