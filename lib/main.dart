@@ -3,6 +3,7 @@ import 'dart:js';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:wares/screens/compatibility.dart';
 import 'package:wares/theme/theme_constants.dart';
 import 'package:wares/theme/theme_manager.dart';
 import 'AllProducts.dart';
@@ -101,6 +102,11 @@ class CustomForm extends StatelessWidget {
   void navigateAllTsKs(BuildContext ctx){
     Navigator.of(ctx).push(MaterialPageRoute(builder: (_){
       return AllTsKs();
+    }));
+  }
+  void navigateCompat(BuildContext ctx){
+    Navigator.of(ctx).push(MaterialPageRoute(builder: (_){
+      return CompatForm();
     }));
   }
 
@@ -232,7 +238,9 @@ class CustomForm extends StatelessWidget {
                                       SizedBox(width: screenWidth *0.3),
                                       Expanded(
                                         child: ElevatedButton(
-                                          onPressed: () {},
+                                          onPressed: () {
+                                            navigateCompat(context);
+                                          },
                                           style: ElevatedButton.styleFrom(padding: const EdgeInsets.all(5)),
                                           child: const Text("COMPATIBILITY"),
                                         ),

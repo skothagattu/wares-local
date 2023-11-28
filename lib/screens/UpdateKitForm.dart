@@ -98,6 +98,7 @@ class _UpdateKitFormState extends State<UpdateKitForm> {
     double formWidth = screenWidth * 0.6;
 
     return SingleChildScrollView(
+
       child: Padding(
         padding: const EdgeInsets.only(top: 10, left: 40, right: 40, bottom: 50),
         child: Container(
@@ -174,6 +175,7 @@ class _UpdateKitFormState extends State<UpdateKitForm> {
 
         ),
       ),
+
     );
   }
 
