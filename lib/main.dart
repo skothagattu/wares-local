@@ -217,7 +217,7 @@ class CustomForm extends StatelessWidget {
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
                         // Top row of buttons
-                        Row(
+/*                        Row(
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
                             SizedBox(width: screenWidth *0.3),
@@ -230,7 +230,7 @@ class CustomForm extends StatelessWidget {
                             ),
                             SizedBox(width: screenWidth *0.3),
                     ]
-                            ),
+                            ),*/
                         SizedBox(height: screenWidth *0.01),
                                   Row(
                                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -248,7 +248,7 @@ class CustomForm extends StatelessWidget {
                                       SizedBox(width: screenWidth *0.3),
                                     ],
                                   ),
-                        SizedBox(height: screenWidth *0.01),
+                        /*SizedBox(height: screenWidth *0.01),
                                   Row(
                                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                     children: [
@@ -262,8 +262,8 @@ class CustomForm extends StatelessWidget {
                                       ),
                                       SizedBox(width: screenWidth *0.3),
                                     ],
-                                  ),
-                        SizedBox(height: screenWidth *0.01),
+                                  ),*/
+/*                        SizedBox(height: screenWidth *0.01),
                             Row(
                               mainAxisAlignment: MainAxisAlignment.spaceBetween,
                               children: [
@@ -277,7 +277,7 @@ class CustomForm extends StatelessWidget {
                                 ),
                                 SizedBox(width: screenWidth *0.3),
                               ],
-                            )
+                            )*/
                           ],
                   )),
 
