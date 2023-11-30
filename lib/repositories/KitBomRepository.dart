@@ -1,7 +1,7 @@
 import 'dart:convert';
 import '../models/KitBomItem.dart';
 import 'package:http/http.dart' as http;
-
+import 'dart:developer' as developer;
 import '../models/KitByProductitem.dart';
 
 abstract class IKitBomRepository {
@@ -60,6 +60,9 @@ class KitBomRepository implements IKitBomRepository {
   Future<List<KitByProductItem>> fetchKitsByProductNo(String productNo) async {
     final url = Uri.parse('$_host/kitsByComponent/$productNo');
     final response = await http.get(url, headers: _headers);
+    developer.log('URL: ${response.request?.url}', name: 'KitBomRepository');
+    developer.log('Status code: ${response.statusCode}', name: 'KitBomRepository');
+
     print('Status code: ${response.statusCode}');
     print('Response body: ${response.body}');
     if (response.statusCode == 200) {
