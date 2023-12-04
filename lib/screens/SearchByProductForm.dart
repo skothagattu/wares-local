@@ -64,7 +64,7 @@ class _SearchByProductFormState extends State<SearchByProductForm> {
             padding: const EdgeInsets.all(16.0),
             child: Column(
               children: [
-                Center(child: Text("SEARCH BY PRODUCTS IN KIT", style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold))),
+                Center(child: Text("SEARCH BY PRODUCT", style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold))),
                 SizedBox(height: 20),
                 Row(
                   children: [

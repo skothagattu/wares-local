@@ -15,7 +15,7 @@ abstract class IProductRepository {
 }
 
 class ProductRepository implements IProductRepository{
-  final _host = "http://localhost:81/api/Products";
+  final _host = "https://localhost:44363/api/Products";
   final Map<String, String> _headers = {
     "Accept" : "application/json",
     "content-type": "application/json",
