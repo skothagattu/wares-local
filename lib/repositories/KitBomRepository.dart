@@ -99,8 +99,9 @@ class KitBomRepository implements IKitBomRepository {
     });
 
     final response = await http.put(url, headers: _headers, body: body);
-
-    if (response.statusCode == 200) {
+    print('Status code: ${response.statusCode}');
+    print('Response body: ${response.body}');
+    if (response.statusCode == 200 || response.statusCode == 204) {
       return true;
     } else {
       // Handle errors
