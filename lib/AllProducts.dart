@@ -1,6 +1,9 @@
 
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:intl/intl.dart';
 import 'package:wares/providers/provider_products.dart';
 import 'package:wares/repositories/products_repository.dart';
 import 'package:wares/screens/edit_products_form.dart';
@@ -60,6 +63,11 @@ class _AllProductsState extends ConsumerState<AllProducts> {
   String lastSearchQuery = '';
   List<Product> searchResults = [];
   bool isSearching = false;
+
+
+  int currentPage = 1;
+  int totalItems = 0;
+
   @override
   void initState() {
     super.initState();
@@ -205,7 +213,19 @@ class _AllProductsState extends ConsumerState<AllProducts> {
       );
     }
   }
-
+  void _showEditProductDialog(Product product) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return EditProductForm(productSubmission: ProductSubmission.fromProduct(product));
+      },
+    ).then((result) {
+      if (result == 'clearProductNumber') {
+        productNoController.clear();
+      }
+      // You may want to do something with the result here, like refreshing the list
+    });
+  }
 
 
   Future<void> _selectDateTime(BuildContext context, TextEditingController controller) async {
@@ -231,11 +251,13 @@ class _AllProductsState extends ConsumerState<AllProducts> {
           selectedTime.minute,
         );
 
-        String formattedDateTime = "${selectedDateTime.toLocal()}".split('.')[0];
+        // Use DateFormat to format the DateTime object
+        String formattedDateTime = DateFormat("yyyy-MM-dd'T'HH:mm:ss").format(selectedDateTime);
         controller.text = formattedDateTime;
       }
     }
   }
+
 
   void _onSubmitPressed() async {
     final isFormComplete = widget.formKey.currentState?.validate() ?? false;
@@ -243,6 +265,7 @@ class _AllProductsState extends ConsumerState<AllProducts> {
 
 
     if (isFormComplete) {
+
       // All fields are filled in, proceed with creating a new product or checking existing
       final productCheckResult = await ref.read(checkProductProvider(partialProductNumber).future);
       if (productCheckResult.item1) {
@@ -254,7 +277,14 @@ class _AllProductsState extends ConsumerState<AllProducts> {
       }
     } else if (partialProductNumber.isNotEmpty) {
       // If the form isn't complete but there's a partial product number, perform a search.
-     _performSearch();
+      final productCheckResult = await ref.read(checkProductProvider(partialProductNumber).future);
+      if (productCheckResult.item1) {
+        // Product number exists, show dialog to edit, don't perform a search
+        _showProductExistsDialog(productCheckResult.item2);
+      } else {
+        // Perform search
+        _performSearch(1);
+      }
     } else {
       // If the form is incomplete and there's no product number, show an error message.
       ScaffoldMessenger.of(context).showSnackBar(
@@ -264,6 +294,7 @@ class _AllProductsState extends ConsumerState<AllProducts> {
   }
 
   void _createNewProduct() {
+    String base64Comments = base64Encode(utf8.encode(commentsController.text));
     final createProductSubmission = ProductSubmission(
       productno: productNoController.text,
       rev: _emptyToNull(revController.text),
@@ -274,7 +305,7 @@ class _AllProductsState extends ConsumerState<AllProducts> {
       type: _emptyToNull(typeController.text),
       ecr: _emptyToNull(ecrController.text),
       listprice: _emptyToNull(listpriceController.text),
-      comments: _emptyToNull(commentsController.text),
+      comments: _emptyToNull(base64Comments),
       active: _emptyToNull(statusController.text),
       labelDesc: _emptyToNull(labelDescController.text),
       productSpec: _emptyToNull(productSpecController.text),
@@ -294,6 +325,7 @@ class _AllProductsState extends ConsumerState<AllProducts> {
       instGuide: _emptyToNull(instGuideController.text),
       // ... Set other fields as needed
     );
+    print(dateReqController.text);
     print('created product: $createProductSubmission');
     ref.read(createProductProvider(createProductSubmission).future).then((success) {
       if (success) {
@@ -314,36 +346,73 @@ class _AllProductsState extends ConsumerState<AllProducts> {
     });
     // ... Existing logic to create a product
   }
-Future<void> _performSearch() async {
-  final partialProductNumber = productNoController.text;
-  setState(() {
-    isSearching = true; // Show a loading indicator
-  });
-  try {
-    final response = await ref.read(productsRepositoryProvider).fetchProductList(
-      pageNumber: 1,
-      pageSize: 15,
-      searchQuery: partialProductNumber,
-    );
+  Future<void> _performSearch(int pageNumber) async {
+    final partialProductNumber = productNoController.text;
     setState(() {
-      searchResults = response.data.items; // Assuming 'items' contains a list of Product objects
+      isSearching = true; // Show a loading indicator
     });
-  } catch (e) {
-    // Handle the error appropriately
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text('An error occurred while searching for products')),
-    );
-  } finally {
-    setState(() {
-      isSearching = false; // Hide the loading indicator
-    });
+    try {
+      final response = await ref.read(productsRepositoryProvider).fetchProductList(
+        pageNumber: pageNumber,
+        pageSize: 50,
+        searchQuery: partialProductNumber,
+      );
+      setState(() {
+        searchResults = response.data.items;
+        // Assuming 'items' contains a list of Product objects
+        totalItems = response.data.totalItems; // Update the total number of items
+        currentPage = pageNumber; // Update the current page
+      });
+    } catch (e) {
+      // Handle the error appropriately
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('An error occurred while searching for products')),
+      );
+    } finally {
+      setState(() {
+        isSearching = false; // Hide the loading indicator
+      });
+    }
   }
-}
+  void _goToPreviousPage() {
+    if (currentPage > 1) {
+      _performSearch(currentPage - 1);
+    }
+  }
+
+  void _goToNextPage() {
+    if (currentPage < (totalItems / 50).ceil()) {
+      _performSearch(currentPage + 1);
+    }
+  }
+
   void navigateLookUp(BuildContext ctx){
     Navigator.of(ctx).push(MaterialPageRoute(builder: (_){
       return LookupListScreen();
     }));
   }
+  Widget _buildTitleWithSearch() {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      children: [
+        Spacer(), // Pushes the title to center
+        Expanded(
+          flex: 2, // Allocates twice the space for the title to ensure it stays centered
+          child: Center( // Centers the title text within the allocated space
+            child: Text("ALL PRODUCTS", style: TextStyle(fontSize: 30)),
+          ),
+        ),
+        Spacer(), // Also pushes the title to center from the right
+        IconButton(
+          icon: Icon(Icons.search),
+          onPressed: () {
+            // Implement what happens when the search icon is pressed
+          },
+        ),
+      ],
+    );
+  }
+
 
 
   @override
@@ -376,14 +445,14 @@ Future<void> _performSearch() async {
                   )
               ),*/
               Expanded(
-                flex: 3,
+                flex:  searchResults.isNotEmpty ? 4 : 5,
                 child:  SingleChildScrollView(
                   child: Container(
-                    padding: const EdgeInsets.only(top:50,left: 40, right: 40, bottom: 40),
+                    padding: const EdgeInsets.all(40),
 
                     child: Container(
                       width: screenWidth * 0.8,
-                     height: screenWidth* 0.35,
+                     height: screenWidth* 0.29,
 
                       decoration: BoxDecoration(
                         border: Border.all(
@@ -405,43 +474,37 @@ Future<void> _performSearch() async {
                         Column(
                           mainAxisSize: MainAxisSize.min,
                           children: [
-                            Text("ALL PRODUCTS", style: TextStyle(fontSize: 30)),
+
+                            _buildTitleWithSearch(),
                             SizedBox(height: screenWidth * 0.03),
                           _buildFormRow(screenWidth, [
-                            productNoController,
-                            revController,
-                            statusController,
-                            typeController,
-                            descriptionController,
-                          ], [
-                            'PRODUCT NUMBER',
-                            'REV',
-                            'STATUS',
-                            'TYPE',
-                            'DESCRIPTION',
+                            _buildStandardTextField(productNoController, 'PRODUCT NUMBER'),
+                            _buildStandardTextField(revController, 'REV'),
+                            _buildStandardTextField(statusController, 'STATUS'),
+                            _buildStandardTextField(typeController, 'TYPE'),
+                            _buildStandardTextField(descriptionController, 'DESCRIPTION'),
+                            // ... other fields// Custom field with date picker
+                            // ... other fields
                           ]),
 
                           SizedBox(height: screenWidth * 0.01),
-                            _buildFormRow(screenWidth, [
-                              labelDescController,
-                              configurationController,
-                              labelConfigController,
-                              dateReqController,
-                              llcController,
-                            ], [
-                              'LABEL DESCRIPTION',
-                              'CONFIGURATION',
-                              'LABEL CONFIGURATION',
-                              'DATE MODIFIED',
-                              'COMPANY',
-                            ]),
+                          _buildFormRow(screenWidth, [
+                            _buildStandardTextField(labelDescController, 'LABEL DESCRIPTION'),
+                            _buildStandardTextField(configurationController, 'CONFIGURATION'),
+                            _buildStandardTextField(labelConfigController, 'LABEL CONFIGURATION'),
+                            _buildDateModifiedField(),
+                            _buildStandardTextField(llcController, 'COMPANY'),
+                            // ... other fields// Custom field with date picker
+                            // ... other fields
+                          ]),
+
                             SizedBox(height: screenWidth * 0.01),
                             // Add more rows of fields in similar fashion
                             // ... (add other rows here)
                             _buildFormRow(screenWidth, [
-                              commentsController,
-                            ], [
-                              'COMMENTS',
+                              _buildStandardTextField(commentsController, 'COMMENTS'),
+                              // Custom field with date picker
+                              // ... other fields
                             ]),
                             SizedBox(height: screenWidth *0.03),
                             Row(
@@ -467,6 +530,9 @@ Future<void> _performSearch() async {
                                   height: MediaQuery.of(context).size.height * 0.05,
                                   child: ElevatedButton(
                                     onPressed: () {
+                                      if (widget.formKey.currentState != null) {
+                                        widget.formKey.currentState!.reset();
+                                      }
                                       // Clear all the text controllers
                                       productNoController.clear();
                                       revController.clear();
@@ -496,8 +562,10 @@ Future<void> _performSearch() async {
                                       level7Controller.clear();
                                       instGuideController.clear();
                                       // Set _isProductNumberValid to false
+
                                       setState(() {
                                         _isProductNumberValid = false;
+                                        searchResults.clear();
                                       });
                                     },
                                     child: Text('Clear'),
@@ -519,25 +587,61 @@ Future<void> _performSearch() async {
               ),
               if (searchResults.isNotEmpty)
                 Expanded(
-                  flex: 1, // Adjust the flex factor to control the size of the DataTable
-                  child: SingleChildScrollView(
-                    child: DataTable(
-                      columns: [
-                        DataColumn(label: Text('Product Number')),
-                        // Add more DataColumn widgets for other product attributes
-                      ],
-                      rows: searchResults.map((product) {
-                        return DataRow(
-                          cells: [
-                            DataCell(Text(product.productno)),
-                            // Add more DataCell widgets for other product attributes
-                          ],
-                        );
-                      }).toList(),
-                    ),
+                  flex: 1,
+                  child: Column(
+                    children: [
+                      // Fixed header
+                      Container(
+                        padding: EdgeInsets.all(15),
+
+                        child:
+                        Text('PRODUCT NUMBER', style: TextStyle(fontWeight: FontWeight.bold)),
+                      ),
+
+                      // Scrollable DataTable
+                      Flexible(
+                        child: SingleChildScrollView(
+                          scrollDirection: Axis.horizontal,
+                          child: SingleChildScrollView(
+                            child: DataTable(
+                              columns: [DataColumn(label: Text(''))],
+                              rows: searchResults.map((product) {
+                                return DataRow(
+                                  onSelectChanged: (bool? selected) {
+                                    if (selected ?? false) {
+                                      _showEditProductDialog(product);
+                                    }
+                                  },
+                                  cells: [DataCell(Text(product.productno))],
+                                );
+                              }).toList(),
+                            ),
+                          ),
+                        ),
+                      ),
+
+                      // Fixed footer for pagination
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          IconButton(
+                            icon: Icon(Icons.chevron_left),
+                            onPressed: currentPage > 1 ? _goToPreviousPage : null,
+                          ),
+                          Text('Page $currentPage of ${((totalItems - 1) / 50).ceil()}'),
+                          IconButton(
+                            icon: Icon(Icons.chevron_right),
+                            onPressed: currentPage < (totalItems / 50).ceil() ? _goToNextPage : null,
+                          ),
+                        ],
+                      ),
+                    ],
                   ),
                 ),
-            ],
+
+
+
+      ],
           )
 
 
@@ -547,16 +651,16 @@ Future<void> _performSearch() async {
     );
 
   }
-  Widget _buildFormRow(double screenWidth, List<TextEditingController> controllers, List<String> labels) {
+  Widget _buildFormRow(double screenWidth, List<Widget> rowFields) {
     double spaceBetweenFields = screenWidth * 0.02; // 2% of the screen width
-    List<Widget> rowFields = [];
+    List<Widget> rowWidgets = [];
 
-    for (int i = 0; i < controllers.length; i++) {
-      rowFields.add(
+    for (int i = 0; i < rowFields.length; i++) {
+      rowWidgets.add(
         Flexible(
           child: Padding(
-            padding: EdgeInsets.only(right: i < controllers.length - 1 ? spaceBetweenFields : 0),
-            child: _buildTextField(controllers[i], labels[i]),
+            padding: EdgeInsets.only(right: i < rowFields.length - 1 ? spaceBetweenFields : 0),
+            child: rowFields[i], // Use the widget directly
           ),
         ),
       );
@@ -564,12 +668,12 @@ Future<void> _performSearch() async {
 
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
-      children: rowFields,
+      children: rowWidgets,
     );
   }
 
 
-  Widget _buildTextField(TextEditingController controller, String label) {
+  Widget _buildStandardTextField(TextEditingController controller, String label) {
     return TextFormField(
       controller: controller,
       decoration: InputDecoration(
@@ -581,8 +685,36 @@ Future<void> _performSearch() async {
         contentPadding: EdgeInsets.symmetric(vertical: 15, horizontal: 15),
       ),
       validator: (value) {
-        if (value == null || value.isEmpty) {
+        if (value == null || value!.isEmpty) {
           return 'Please enter $label';
+        }
+        return null;
+      },
+    );
+  }
+
+  Widget _buildDateModifiedField() {
+    return TextFormField(
+      controller: dateReqController,
+      readOnly: true, // Makes the field not editable directly
+      decoration: InputDecoration(
+        labelText: 'Date Modified',
+        labelStyle: TextStyle(fontWeight: FontWeight.bold),
+        border: OutlineInputBorder(
+          borderSide: BorderSide(width: 2),
+        ),
+        contentPadding: EdgeInsets.symmetric(vertical: 15, horizontal: 15),
+        suffixIcon: Icon(Icons.calendar_today), // Calendar icon
+      ),
+      onTap: () async {
+        // Prevents keyboard from appearing
+        FocusScope.of(context).requestFocus(new FocusNode());
+        // Opens date picker
+        await _selectDateTime(context, dateReqController);
+      },
+      validator: (value) {
+        if (value == null || value.isEmpty) {
+          return 'Please enter Date Modified';
         }
         return null;
       },
