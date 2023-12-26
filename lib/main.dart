@@ -3,6 +3,7 @@ import 'dart:js';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:wares/screens/Login.dart';
 import 'package:wares/screens/compatibility.dart';
 import 'package:wares/theme/theme_constants.dart';
 import 'package:wares/theme/theme_manager.dart';
@@ -86,7 +87,11 @@ class _MyAppState extends State<MyApp>{
           )
       ),
       themeMode: _themeManager.themeMode,
-      home: const CustomForm(),
+      initialRoute: '/',
+      routes: {
+        '/': (context) => LoginPage(), // LoginPage is the first screen displayed
+        '/home': (context) => CustomForm(), // Navigate to this screen post-login
+      },
     );
   }
 }
@@ -118,25 +123,6 @@ class CustomForm extends StatelessWidget {
 
         title: Image.asset('images/logo_cmi.png'),
         centerTitle: true,
-        /* leading: BackButton(
-            onPressed: () {},
-          ),*/
-
-
-        /*Center(
-
-          child: SizedBox(
-            width:400,
-
-            *//*child:
-
-            Image.asset('images/logo_cmi.png'),*//*
-
-
-          ),
-
-
-        ),*/
         actions: [Switch(value: _themeManager.themeMode ==ThemeMode.dark, onChanged: (newValue){ _themeManager.toggleTheme(newValue);})],
       ),
 
@@ -216,21 +202,6 @@ class CustomForm extends StatelessWidget {
                   SingleChildScrollView(child: Column(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
-                        // Top row of buttons
-/*                        Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            SizedBox(width: screenWidth *0.3),
-                            Expanded(
-                              child: ElevatedButton(
-                                onPressed: () {},
-                                style: ElevatedButton.styleFrom(padding: const EdgeInsets.all(15)),
-                                child: const Text("FIND 'T' BY ENTERING MODEL AND READER"),
-                              ),
-                            ),
-                            SizedBox(width: screenWidth *0.3),
-                    ]
-                            ),*/
                         SizedBox(height: screenWidth *0.01),
                                   Row(
                                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -248,36 +219,6 @@ class CustomForm extends StatelessWidget {
                                       SizedBox(width: screenWidth *0.3),
                                     ],
                                   ),
-                        /*SizedBox(height: screenWidth *0.01),
-                                  Row(
-                                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                    children: [
-                                      SizedBox(width: screenWidth *0.3),
-                                      Expanded(
-                                        child: ElevatedButton(
-                                          onPressed: () {},
-                                          style: ElevatedButton.styleFrom(padding: const EdgeInsets.all(5)),
-                                          child: const Text("WHERE USED QUERY"),
-                                        ),
-                                      ),
-                                      SizedBox(width: screenWidth *0.3),
-                                    ],
-                                  ),*/
-/*                        SizedBox(height: screenWidth *0.01),
-                            Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              children: [
-                                SizedBox(width: screenWidth *0.3),
-                                Expanded(
-                                  child: ElevatedButton(
-                                    onPressed: () {},
-                                    style: ElevatedButton.styleFrom(padding: const EdgeInsets.all(15)),
-                                    child: const Text("FIND 'K' BY ENTERING 'T'.COM MOD AND 1 OTHER"),
-                                  ),
-                                ),
-                                SizedBox(width: screenWidth *0.3),
-                              ],
-                            )*/
                           ],
                   )),
 
