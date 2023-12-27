@@ -3,12 +3,15 @@ import 'dart:js';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:jwt_decode/jwt_decode.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:wares/screens/Login.dart';
 import 'package:wares/screens/compatibility.dart';
 import 'package:wares/theme/theme_constants.dart';
 import 'package:wares/theme/theme_manager.dart';
 import 'AllProducts.dart';
 import 'AllTsKs.dart';
+import 'Service/ApiService.dart';
 class MyHttpOverrides extends HttpOverrides{
   @override
 HttpClient createHttpClient(SecurityContext? context){
@@ -19,14 +22,28 @@ HttpClient createHttpClient(SecurityContext? context){
   }
 }
 
-void main() {
+void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   HttpOverrides.global = MyHttpOverrides();
-  runApp(const ProviderScope(child: MyApp()));
+  SharedPreferences prefs = await SharedPreferences.getInstance();
+  String? token = prefs.getString('token');
+  bool isTokenExpired = true;
+
+  if (token != null) {
+    try {
+      Map<String, dynamic> decodedToken = Jwt.parseJwt(token);
+      DateTime expiryDate = DateTime.fromMillisecondsSinceEpoch(decodedToken['exp'] * 1000);
+      isTokenExpired = DateTime.now().isAfter(expiryDate);
+    } catch (e) {
+      // Handle error or invalid token
+    }
+  }
+  runApp(ProviderScope(child: MyApp(homeRoute: (!isTokenExpired) ? '/home' : '/')));
 }
 ThemeManager _themeManager = ThemeManager();
 class MyApp extends StatefulWidget {
-  const MyApp({super.key});
+  final String homeRoute;
+  const MyApp({super.key, required this.homeRoute});
 
 
   @override
@@ -43,6 +60,8 @@ class _MyAppState extends State<MyApp>{
   @override
   void initState() {
     _themeManager.addListener(themeListner);
+
+
     super.initState();
   }
 
@@ -53,9 +72,16 @@ class _MyAppState extends State<MyApp>{
       });
     }
   }
+  void _logout(BuildContext context) async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    await prefs.remove('token'); // Clear the token
+    await prefs.remove('roles'); // Clear the roles
+    Navigator.of(context).pushReplacementNamed('/'); // Navigate to login page
+  }
+
   @override
   Widget build(BuildContext context) {
-
+    ApiService apiService = ApiService(onLogout: () => _logout(context));
     return MaterialApp(
       theme: ThemeData(
           colorSchemeSeed: Colors.lightBlueAccent,
@@ -87,17 +113,18 @@ class _MyAppState extends State<MyApp>{
           )
       ),
       themeMode: _themeManager.themeMode,
-      initialRoute: '/',
+      initialRoute: 'homeRoute',
       routes: {
         '/': (context) => LoginPage(), // LoginPage is the first screen displayed
-        '/home': (context) => CustomForm(), // Navigate to this screen post-login
+        '/home': (context) => CustomForm(apiService: apiService), // Navigate to this screen post-login
       },
     );
   }
 }
 
 class CustomForm extends StatelessWidget {
-  const CustomForm({super.key});
+  final ApiService apiService;
+  const CustomForm({super.key, required this.apiService});
 
   void navigateAllProds(BuildContext ctx){
     Navigator.of(ctx).push(MaterialPageRoute(builder: (_){
@@ -114,6 +141,12 @@ class CustomForm extends StatelessWidget {
       return CompatForm();
     }));
   }
+  void _logout(BuildContext context) async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    await prefs.remove('token'); // Clear the token
+    await prefs.remove('roles'); // Clear the roles
+    Navigator.of(context).pushReplacementNamed('/'); // Navigate to login page
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -123,7 +156,12 @@ class CustomForm extends StatelessWidget {
 
         title: Image.asset('images/logo_cmi.png'),
         centerTitle: true,
-        actions: [Switch(value: _themeManager.themeMode ==ThemeMode.dark, onChanged: (newValue){ _themeManager.toggleTheme(newValue);})],
+        actions: [Switch(value: _themeManager.themeMode ==ThemeMode.dark, onChanged: (newValue){ _themeManager.toggleTheme(newValue);}),
+          IconButton(
+            icon: Icon(Icons.logout),
+            onPressed: () => _logout(context),
+          ),
+        ],
       ),
 
 

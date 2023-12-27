@@ -1,6 +1,9 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
+import 'package:shared_preferences/shared_preferences.dart';
+
+import '../main.dart';
 
 
 class LoginPage extends StatefulWidget {
@@ -15,7 +18,6 @@ class _LoginPageState extends State<LoginPage> {
   bool _isPasswordSet = false;
   bool _showReEnterPassword = false;
   String _message = '';
-
   void _login() async {
     var response = await http.post(
       Uri.parse('https://localhost:44363/api/Auth/login'),
@@ -30,16 +32,22 @@ class _LoginPageState extends State<LoginPage> {
 
     if (response.statusCode == 200) {
       var data = json.decode(response.body);
+      SharedPreferences prefs = await SharedPreferences.getInstance();
       if (data['setPassword'] == true) {
+        // Prompt user to set a password
         setState(() {
           _isPasswordSet = true;
           _showReEnterPassword = true;
           _message = "Please set your password.";
         });
       } else {
-        setState(() {
-          _message = "Logged in successfully";
-        });
+        // Successful login
+
+        await prefs.setString('token', data['token']);
+        await prefs.setStringList('roles', data['roles'].map<String>((role) => role.toString()).toList());
+        // Navigate to the main page
+        Navigator.of(context).pushReplacementNamed('/home');
+
       }
     } else {
       setState(() {
@@ -65,6 +73,7 @@ class _LoginPageState extends State<LoginPage> {
         setState(() {
           _message = "Password set successfully. Please log in again.";
           _showReEnterPassword = false;
+          _isPasswordSet = false; // Reset the flag as the password is now set
           _passwordController.clear();
           _rePasswordController.clear();
         });
