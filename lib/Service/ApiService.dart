@@ -60,6 +60,18 @@ class ApiService {
       body: json.encode(body),
     );
   }
+  Future<http.Response> delete(String endpoint) async {
+    final prefs = await SharedPreferences.getInstance();
+    final token = prefs.getString('token');
+    final response = await http.delete(
+      Uri.parse('$endpoint'),
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer $token',
+      },
+    );
+    return _handleResponse(response);
+  }
 
 // Add delete method as needed
 }

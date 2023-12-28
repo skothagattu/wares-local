@@ -83,7 +83,7 @@ print(url);
   Future<Tuple2<bool, Product?>> checkProduct(String productNo) async {
     final url = Uri.parse('$_host/$productNo');
     try {
-      final response = await http.get(url, headers: _headers);
+      final response = await _apiService.get(url.toString());
       if (response.statusCode == 200) {
         final product = Product.fromJson(json.decode(response.body));
         return Tuple2(true, product);
@@ -104,7 +104,7 @@ print(url);
   Future<Product> fetchProductDetails(String productNo) async {
     final url = Uri.parse('$_host/$productNo');
     try {
-      final response = await http.get(url, headers: _headers);
+      final response = await _apiService.get(url.toString());
       if (response.statusCode == 200) {
         final product = Product.fromJson(json.decode(response.body));
         return product;
