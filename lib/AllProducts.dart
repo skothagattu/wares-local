@@ -264,7 +264,7 @@ class _AllProductsState extends ConsumerState<AllProducts> {
   void _onSubmitPressed() async {
     final isFormComplete = widget.formKey.currentState?.validate() ?? false;
     final partialProductNumber = productNoController.text;
-
+    final partialDescription = descriptionController.text;
 
     if (isFormComplete) {
 
@@ -277,7 +277,7 @@ class _AllProductsState extends ConsumerState<AllProducts> {
         // Create a new product
         _createNewProduct();
       }
-    } else if (partialProductNumber.isNotEmpty) {
+    } else if (partialProductNumber.isNotEmpty || partialDescription.isNotEmpty) {
       // If the form isn't complete but there's a partial product number, perform a search.
       final productCheckResult = await ref.read(checkProductProvider(partialProductNumber).future);
       if (productCheckResult.item1) {
@@ -350,6 +350,7 @@ class _AllProductsState extends ConsumerState<AllProducts> {
   }
   Future<void> _performSearch(int pageNumber) async {
     final partialProductNumber = productNoController.text;
+    final partialDescription = descriptionController.text;
     setState(() {
       isSearching = true; // Show a loading indicator
     });
@@ -358,6 +359,7 @@ class _AllProductsState extends ConsumerState<AllProducts> {
         pageNumber: pageNumber,
         pageSize: 50,
         searchQuery: partialProductNumber,
+        descriptionQuery: partialDescription,
       );
       setState(() {
         searchResults = response.data.items;
@@ -416,7 +418,8 @@ class _AllProductsState extends ConsumerState<AllProducts> {
           onPressed: () async {
             // Implement what happens when the search icon is pressed
             final partialProductNumber = productNoController.text;
-            if (partialProductNumber.isNotEmpty) {
+            final partialDescription = descriptionController.text;
+            if (partialProductNumber.isNotEmpty || partialDescription.isNotEmpty) {
               // If the form isn't complete but there's a partial product number, perform a search.
               final productCheckResult = await ref.read(
                   checkProductProvider(partialProductNumber).future);
