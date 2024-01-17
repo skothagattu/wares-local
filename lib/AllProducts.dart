@@ -19,7 +19,7 @@ class AllProducts extends ConsumerStatefulWidget  {
     Navigator.of(ctx).pop();
   }
   final formKey = GlobalKey<FormState>();
-  final ProductSubmission productSubmission = ProductSubmission(
+  ProductSubmission productSubmission = ProductSubmission(
     // Initialize with default values or fetch from an API if needed
   );
 
@@ -217,7 +217,7 @@ class _AllProductsState extends ConsumerState<AllProducts> {
       context: context,
       builder: (BuildContext context) {
         return EditProductForm(productSubmission: ProductSubmission.fromProduct(product),
-          onProductUpdated: _refreshDataTable,
+          /*onProductUpdated: _refreshDataTable,*/
         );
 
       },
