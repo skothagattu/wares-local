@@ -12,9 +12,9 @@ import '../providers/provider_products.dart';
 
 class EditProductForm extends ConsumerStatefulWidget  {
   ProductSubmission productSubmission;
-  final VoidCallback? onProductUpdated;
+  final Function(Product) onProductUpdated;
 
-  EditProductForm({required this.productSubmission, this.onProductUpdated});
+  EditProductForm({required this.productSubmission, required this.onProductUpdated});
 
 
   @override
@@ -159,7 +159,6 @@ class _EditProductFormState extends ConsumerState<EditProductForm> {
 
 
   void _updateFormFields(Product product) {
-    print("9");
     // Update all your text controllers with the new product data
     _revController.text = product.rev ?? '';
     _activeController.text = product.active ?? '';
@@ -176,7 +175,6 @@ class _EditProductFormState extends ConsumerState<EditProductForm> {
     _labelDescController.text = product.labeL_DESC ?? '';
     _labelConfigController.text = product.labeL_CONFIG ?? '';
     _dateReqController.text = product.datE_REQ ?? '';
-    print("10");
   }
 
   @override
@@ -309,10 +307,11 @@ class _EditProductFormState extends ConsumerState<EditProductForm> {
 
                     ref.read(updateProductProvider(
                         Tuple2(productNo, UpdateProductSubmission)).future).then((
-                        success) {
+                        success) async {
                       if (success) {
+                        final updatedProduct = await ref.read(fetchProductDetailsProvider(productNo).future);
                         if (widget.onProductUpdated != null) {
-                          widget.onProductUpdated!();
+                          widget.onProductUpdated!(updatedProduct);
                         }
                         Navigator.of(context).pop('clearProductNumber');
                         ScaffoldMessenger.of(context).showSnackBar(
