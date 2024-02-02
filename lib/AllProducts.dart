@@ -215,14 +215,16 @@ class _AllProductsState extends ConsumerState<AllProducts> {
       );
     }
   }
-  void _showEditProductDialog(Product product) {
+  void _showEditProductDialog(Product product, List<Product> searchResults, int currentIndex) {
     showDialog(
       context: context,
       builder: (BuildContext context) {
         return EditProductForm(productSubmission: ProductSubmission.fromProduct(product),
           onProductUpdated: (updatedProduct){
           _updateProductInList(updatedProduct);
-        }
+        },
+          searchResults: searchResults,
+          currentIndex: currentIndex,
         );
 
       },
@@ -634,17 +636,18 @@ class _AllProductsState extends ConsumerState<AllProducts> {
                           scrollDirection: Axis.horizontal,
                           child: SingleChildScrollView(
                             child: DataTable(
-                              columns: [DataColumn(label: Text(''))],
-                              rows: searchResults.map((product) {
-                                return DataRow(
+                              columns: [DataColumn(label: Text('Product Number'))],
+                              rows: List<DataRow>.generate(
+                                searchResults.length,
+                                    (index) => DataRow(
                                   onSelectChanged: (bool? selected) {
                                     if (selected ?? false) {
-                                      _showEditProductDialog(product);
+                                      _showEditProductDialog(searchResults[index], searchResults, index);
                                     }
                                   },
-                                  cells: [DataCell(Text(product.productno))],
-                                );
-                              }).toList(),
+                                  cells: [DataCell(Text(searchResults[index].productno))],
+                                ),
+                              ),
                             ),
                           ),
                         ),
@@ -713,6 +716,9 @@ class _AllProductsState extends ConsumerState<AllProducts> {
         ),
         contentPadding: EdgeInsets.symmetric(vertical: 15, horizontal: 15),
       ),
+      onFieldSubmitted: (value) {
+        _onSubmitPressed();
+      },
       validator: (value) {
         if (value == null || value!.isEmpty) {
           return 'Please enter $label';
